@@ -1,0 +1,31 @@
+[project]
+name = "base60lab"
+version = "0.1.0"
+description = "Base-10 / Base-12 / Base-60 exact rational research laboratory"
+requires-python = ">=3.12"
+dependencies = [
+    "sympy",
+    "numpy",
+    "scipy",
+    "mpmath",
+    "matplotlib",
+    "pandas",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["base60lab*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

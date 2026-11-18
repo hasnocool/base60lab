@@ -1,0 +1,7 @@
+> """Core shared layer: exact rational arithmetic, base types, and unknowns registry."""
+  
+> from .rational import Rational
+> from .types import BaseNumber, Expression, Notation, Function
+> from .unknowns import UnknownsRegistry
+  
+> __all__ = ["Rational", "BaseNumber", "Expression", "Notation", "Function", "UnknownsRegistry"]

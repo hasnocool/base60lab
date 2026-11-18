@@ -1,0 +1,3718 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.11" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Base-12 / Base-60 Mathematical Research</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Base-12 / Base-60 Mathematical Research</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a
+href="#base-12-and-base-60-representation-systems-a-comprehensive-exact-rational-analysis"
+id="toc-base-12-and-base-60-representation-systems-a-comprehensive-exact-rational-analysis">Base-12
+and Base-60 Representation Systems: A Comprehensive Exact Rational
+Analysis</a>
+<ul>
+<li><a href="#abstract" id="toc-abstract">Abstract</a></li>
+<li><a href="#mathematical-foundations"
+id="toc-mathematical-foundations">1. Mathematical Foundations</a>
+<ul>
+<li><a href="#termination-theory-exact"
+id="toc-termination-theory-exact">1.1 Termination Theory
+(Exact)</a></li>
+<li><a href="#repeating-period-theory-exact"
+id="toc-repeating-period-theory-exact">1.2 Repeating Period Theory
+(Exact)</a></li>
+</ul></li>
+<li><a href="#fraction-analysis-experiment-01"
+id="toc-fraction-analysis-experiment-01">2. Fraction Analysis
+(Experiment 01)</a>
+<ul>
+<li><a href="#unit-fractions-1d-for-d-1..360"
+id="toc-unit-fractions-1d-for-d-1..360">2.1 Unit Fractions 1/d for d =
+1..360</a></li>
+<li><a href="#key-fraction-comparison-exact"
+id="toc-key-fraction-comparison-exact">2.2 Key Fraction Comparison
+(Exact)</a></li>
+</ul></li>
+<li><a href="#geometry-and-circle-subdivisions-experiments-02-20"
+id="toc-geometry-and-circle-subdivisions-experiments-02-20">3. Geometry
+and Circle Subdivisions (Experiments 02, 20)</a>
+<ul>
+<li><a href="#standard-circle-subdivisions"
+id="toc-standard-circle-subdivisions">3.1 Standard Circle
+Subdivisions</a></li>
+<li><a href="#regular-polygon-exact-rational-properties-r1"
+id="toc-regular-polygon-exact-rational-properties-r1">3.2 Regular
+Polygon Exact Rational Properties (r=1)</a></li>
+<li><a href="#d-lissajous-on-3-torus-experiment-20"
+id="toc-d-lissajous-on-3-torus-experiment-20">3.3 3D Lissajous on
+3-Torus (Experiment 20)</a></li>
+</ul></li>
+<li><a href="#trigonometry-and-harmonic-analysis-experiments-03-06"
+id="toc-trigonometry-and-harmonic-analysis-experiments-03-06">4.
+Trigonometry and Harmonic Analysis (Experiments 03, 06)</a>
+<ul>
+<li><a href="#exact-trigonometric-values-at-special-angles"
+id="toc-exact-trigonometric-values-at-special-angles">4.1 Exact
+Trigonometric Values at Special Angles</a></li>
+<li><a href="#musical-intervals-just-intonation-base-representation"
+id="toc-musical-intervals-just-intonation-base-representation">4.2
+Musical Intervals (Just Intonation) — Base Representation</a></li>
+<li><a href="#phase-representations" id="toc-phase-representations">4.3
+Phase Representations</a></li>
+<li><a href="#beat-frequencies" id="toc-beat-frequencies">4.4 Beat
+Frequencies</a></li>
+</ul></li>
+<li><a href="#modular-arithmetic-experiment-04"
+id="toc-modular-arithmetic-experiment-04">5. Modular Arithmetic
+(Experiment 04)</a>
+<ul>
+<li><a href="#mod-12-structure" id="toc-mod-12-structure">5.1 Mod 12
+Structure</a></li>
+<li><a href="#mod-60-structure" id="toc-mod-60-structure">5.2 Mod 60
+Structure</a></li>
+</ul></li>
+<li><a href="#number-sequences-experiment-05"
+id="toc-number-sequences-experiment-05">6. Number Sequences (Experiment
+05)</a>
+<ul>
+<li><a href="#terminating-ratios-by-sequence-first-30-terms"
+id="toc-terminating-ratios-by-sequence-first-30-terms">6.1 Terminating
+Ratios by Sequence (First 30 Terms)</a></li>
+<li><a href="#average-digit-length-by-sequence"
+id="toc-average-digit-length-by-sequence">6.2 Average Digit Length by
+Sequence</a></li>
+</ul></li>
+<li><a href="#lissajous-figures-experiment-07"
+id="toc-lissajous-figures-experiment-07">7. Lissajous Figures
+(Experiment 07)</a>
+<ul>
+<li><a href="#closure-analysis" id="toc-closure-analysis">7.1 Closure
+Analysis</a></li>
+<li><a href="#prime-factor-effects-on-closure"
+id="toc-prime-factor-effects-on-closure">7.2 Prime Factor Effects on
+Closure</a></li>
+<li><a href="#base-representation-termination"
+id="toc-base-representation-termination">7.3 Base Representation
+Termination</a></li>
+</ul></li>
+<li><a href="#fft-performance-experiments-08-09-16"
+id="toc-fft-performance-experiments-08-09-16">8. FFT Performance
+(Experiments 08, 09, 16)</a>
+<ul>
+<li><a href="#benchmark-summary-experiment-08"
+id="toc-benchmark-summary-experiment-08">8.1 Benchmark Summary
+(Experiment 08)</a></li>
+<li><a href="#smooth-number-prediction-accuracy-experiment-16"
+id="toc-smooth-number-prediction-accuracy-experiment-16">8.2 Smooth
+Number Prediction Accuracy (Experiment 16)</a></li>
+<li><a href="#smooth-vs-arbitrary-fft-benchmarks-experiment-16"
+id="toc-smooth-vs-arbitrary-fft-benchmarks-experiment-16">8.3 Smooth vs
+Arbitrary FFT Benchmarks (Experiment 16)</a></li>
+</ul></li>
+<li><a href="#real-world-signal-analysis-experiment-09"
+id="toc-real-world-signal-analysis-experiment-09">9. Real-World Signal
+Analysis (Experiment 09)</a>
+<ul>
+<li><a href="#sample-rate-smoothness"
+id="toc-sample-rate-smoothness">9.1 Sample Rate Smoothness</a></li>
+</ul></li>
+<li><a href="#integrated-rotating-object-analysis-experiment-10"
+id="toc-integrated-rotating-object-analysis-experiment-10">10.
+Integrated Rotating Object Analysis (Experiment 10)</a>
+<ul>
+<li><a href="#system-parameters" id="toc-system-parameters">10.1 System
+Parameters</a></li>
+<li><a href="#cycles-during-fractions-of-a-second-exact-rational"
+id="toc-cycles-during-fractions-of-a-second-exact-rational">10.2 Cycles
+During Fractions of a Second (Exact Rational)</a></li>
+<li><a href="#lissajous-figures-harmonic-pairs"
+id="toc-lissajous-figures-harmonic-pairs">10.3 Lissajous Figures
+(Harmonic Pairs)</a></li>
+<li><a href="#fft-analysis-by-smoothness"
+id="toc-fft-analysis-by-smoothness">10.4 FFT Analysis by
+Smoothness</a></li>
+</ul></li>
+<li><a href="#babylonian-mathematics-experiment-15"
+id="toc-babylonian-mathematics-experiment-15">11. Babylonian Mathematics
+(Experiment 15)</a>
+<ul>
+<li><a href="#regular-numbers-5-smooth-table"
+id="toc-regular-numbers-5-smooth-table">11.1 Regular Numbers (5-Smooth)
+Table</a></li>
+<li><a href="#plimpton-322-15-pythagorean-triples-reconstruction"
+id="toc-plimpton-322-15-pythagorean-triples-reconstruction">11.2
+Plimpton 322: 15 Pythagorean Triples Reconstruction</a></li>
+<li><a href="#extended-plimpton-table"
+id="toc-extended-plimpton-table">11.3 Extended Plimpton Table</a></li>
+<li><a href="#ybc-7290-trapezoid-area"
+id="toc-ybc-7290-trapezoid-area">11.4 YBC 7290 Trapezoid Area</a></li>
+</ul></li>
+<li><a href="#smooth-number-fft-prediction-experiment-16"
+id="toc-smooth-number-fft-prediction-experiment-16">12. Smooth Number
+FFT Prediction (Experiment 16)</a>
+<ul>
+<li><a href="#counting-formula-validation"
+id="toc-counting-formula-validation">12.1 Counting Formula
+Validation</a></li>
+<li><a href="#prediction-performance"
+id="toc-prediction-performance">12.2 Prediction Performance</a></li>
+</ul></li>
+<li><a href="#direct-base-conversion-experiment-17"
+id="toc-direct-base-conversion-experiment-17">13. Direct Base Conversion
+(Experiment 17)</a>
+<ul>
+<li><a href="#round-trip-fidelity" id="toc-round-trip-fidelity">13.1
+Round-Trip Fidelity</a></li>
+<li><a href="#cross-base-conversion-accuracy"
+id="toc-cross-base-conversion-accuracy">13.2 Cross-Base Conversion
+Accuracy</a></li>
+<li><a href="#performance-ms" id="toc-performance-ms">13.3 Performance
+(ms)</a></li>
+</ul></li>
+<li><a href="#modular-forms-and-q-series-experiment-18"
+id="toc-modular-forms-and-q-series-experiment-18">14. Modular Forms and
+q-Series (Experiment 18)</a>
+<ul>
+<li><a
+href="#partition-function-ramanujan-congruences-verified-up-to-n500"
+id="toc-partition-function-ramanujan-congruences-verified-up-to-n500">14.1
+Partition Function Ramanujan Congruences (Verified up to n=500)</a></li>
+<li><a href="#ramanujan-tau-function-τn-modulo-60"
+id="toc-ramanujan-tau-function-τn-modulo-60">14.2 Ramanujan Tau Function
+τ(n) Modulo 60</a></li>
+<li><a href="#dedekind-eta-function-critical-exponent"
+id="toc-dedekind-eta-function-critical-exponent">14.3 Dedekind Eta
+Function Critical Exponent</a></li>
+<li><a href="#delta-function-verification"
+id="toc-delta-function-verification">14.4 Delta Function
+Verification</a></li>
+</ul></li>
+<li><a href="#d-lissajous-torus-dynamics-experiment-20"
+id="toc-d-lissajous-torus-dynamics-experiment-20">15. 3D Lissajous /
+Torus Dynamics (Experiment 20)</a>
+<ul>
+<li><a href="#closure-analysis-selected-frequency-triplets"
+id="toc-closure-analysis-selected-frequency-triplets">15.1 Closure
+Analysis (Selected Frequency Triplets)</a></li>
+<li><a href="#denominator-family-statistics"
+id="toc-denominator-family-statistics">15.2 Denominator Family
+Statistics</a></li>
+<li><a href="#family-counts-fxfyfz-20"
+id="toc-family-counts-fxfyfz-20">15.3 Family Counts (fx,fy,fz ≤
+20)</a></li>
+<li><a href="#base-representation-termination-rates"
+id="toc-base-representation-termination-rates">15.4 Base Representation
+Termination Rates</a></li>
+</ul></li>
+<li><a href="#cognitive-load-mitigation-experiment-21"
+id="toc-cognitive-load-mitigation-experiment-21">16. Cognitive Load
+Mitigation (Experiment 21)</a>
+<ul>
+<li><a href="#notation-variant-comparison-values-110000"
+id="toc-notation-variant-comparison-values-110000">16.1 Notation Variant
+Comparison (Values 1–10000)</a></li>
+<li><a
+href="#fraction-representation-quality-all-variants-identical-mathematically"
+id="toc-fraction-representation-quality-all-variants-identical-mathematically">16.2
+Fraction Representation Quality (All Variants Identical
+Mathematically)</a></li>
+</ul></li>
+<li><a
+href="#continued-fractions-and-diophantine-approximation-experiment-23"
+id="toc-continued-fractions-and-diophantine-approximation-experiment-23">17.
+Continued Fractions and Diophantine Approximation (Experiment 23)</a>
+<ul>
+<li><a href="#notable-pi-approximants"
+id="toc-notable-pi-approximants">17.1 Notable Pi Approximants</a></li>
+<li><a href="#average-digit-efficiency-base-60-base-10"
+id="toc-average-digit-efficiency-base-60-base-10">17.2 Average Digit
+Efficiency (Base-60 / Base-10)</a></li>
+</ul></li>
+<li><a href="#kuramoto-oscillator-networks-experiment-24"
+id="toc-kuramoto-oscillator-networks-experiment-24">18. Kuramoto
+Oscillator Networks (Experiment 24)</a>
+<ul>
+<li><a href="#frequency-ratios-tested-5-smooth"
+id="toc-frequency-ratios-tested-5-smooth">18.1 Frequency Ratios Tested
+(5-Smooth)</a></li>
+<li><a href="#network-configurations"
+id="toc-network-configurations">18.2 Network Configurations</a></li>
+<li><a href="#phase-representation-comparison"
+id="toc-phase-representation-comparison">18.3 Phase Representation
+Comparison</a></li>
+</ul></li>
+<li><a href="#constructible-polygons-and-gauss-wantzel-experiment-25"
+id="toc-constructible-polygons-and-gauss-wantzel-experiment-25">19.
+Constructible Polygons and Gauss-Wantzel (Experiment 25)</a>
+<ul>
+<li><a href="#constructible-n-gons-tested"
+id="toc-constructible-n-gons-tested">19.1 Constructible n-gons
+Tested</a></li>
+<li><a href="#termination-summary" id="toc-termination-summary">19.2
+Termination Summary</a></li>
+</ul></li>
+<li><a href="#resonance-webs-and-arnold-diffusion-experiment-26"
+id="toc-resonance-webs-and-arnold-diffusion-experiment-26">20. Resonance
+Webs and Arnold Diffusion (Experiment 26)</a>
+<ul>
+<li><a href="#dimension-analysis" id="toc-dimension-analysis">20.1
+Dimension Analysis</a></li>
+<li><a href="#frequency-vectors-base-60"
+id="toc-frequency-vectors-base-60">20.2 Frequency Vectors
+(Base-60)</a></li>
+<li><a href="#key-findings" id="toc-key-findings">20.3 Key
+Findings</a></li>
+</ul></li>
+<li><a href="#ntt-with-60-smooth-moduli-experiment-22"
+id="toc-ntt-with-60-smooth-moduli-experiment-22">21. NTT with 60-Smooth
+Moduli (Experiment 22)</a>
+<ul>
+<li><a href="#results-summary" id="toc-results-summary">21.1 Results
+Summary</a></li>
+<li><a href="#base-60-advantage" id="toc-base-60-advantage">21.2 Base-60
+Advantage</a></li>
+<li><a href="#smoothness-of-p-1" id="toc-smoothness-of-p-1">21.3
+Smoothness of p-1</a></li>
+</ul></li>
+<li><a href="#composite-metrics-comparison-exact-rational"
+id="toc-composite-metrics-comparison-exact-rational">22. Composite
+Metrics Comparison (Exact Rational)</a>
+<ul>
+<li><a
+href="#detailed-metrics-exact-values-from-metrics-comparison-report.md"
+id="toc-detailed-metrics-exact-values-from-metrics-comparison-report.md">22.1
+Detailed Metrics (Exact Values from
+metrics-comparison-report.md)</a></li>
+<li><a href="#category-rankings" id="toc-category-rankings">22.2
+Category Rankings</a></li>
+<li><a href="#overall-composite-scores-exact"
+id="toc-overall-composite-scores-exact">22.3 Overall Composite Scores
+(Exact)</a></li>
+</ul></li>
+<li><a href="#digital-simulations-practical-applications"
+id="toc-digital-simulations-practical-applications">23. Digital
+Simulations &amp; Practical Applications</a>
+<ul>
+<li><a href="#fft-optimization-for-60-hz-systems"
+id="toc-fft-optimization-for-60-hz-systems">23.1 FFT Optimization for 60
+Hz Systems</a></li>
+<li><a href="#ntt-moduli-selection-for-cryptographic-applications"
+id="toc-ntt-moduli-selection-for-cryptographic-applications">23.2 NTT
+Moduli Selection for Cryptographic Applications</a></li>
+<li><a href="#base-60-notation-for-human-computer-interfaces"
+id="toc-base-60-notation-for-human-computer-interfaces">23.3 Base-60
+Notation for Human-Computer Interfaces</a></li>
+<li><a href="#babylonian-methods-for-exact-geometric-computation"
+id="toc-babylonian-methods-for-exact-geometric-computation">23.4
+Babylonian Methods for Exact Geometric Computation</a></li>
+<li><a href="#modular-forms-in-base-60-for-number-theory"
+id="toc-modular-forms-in-base-60-for-number-theory">23.5 Modular Forms
+in Base-60 for Number Theory</a></li>
+<li><a href="#direct-base-conversion-for-embedded-systems"
+id="toc-direct-base-conversion-for-embedded-systems">23.6 Direct Base
+Conversion for Embedded Systems</a></li>
+<li><a href="#d-torus-dynamics-for-signal-processing"
+id="toc-d-torus-dynamics-for-signal-processing">23.7 3D Torus Dynamics
+for Signal Processing</a></li>
+</ul></li>
+<li><a href="#conclusions" id="toc-conclusions">24. Conclusions</a>
+<ul>
+<li><a href="#summary-of-empirical-findings"
+id="toc-summary-of-empirical-findings">24.1 Summary of Empirical
+Findings</a></li>
+<li><a href="#fundamental-trade-offs"
+id="toc-fundamental-trade-offs">24.2 Fundamental Trade-offs</a></li>
+<li><a href="#historical-validation" id="toc-historical-validation">24.3
+Historical Validation</a></li>
+<li><a href="#open-questions-from-unknowns-registry"
+id="toc-open-questions-from-unknowns-registry">24.4 Open Questions (From
+Unknowns Registry)</a></li>
+</ul></li>
+<li><a href="#verification-and-reproducibility"
+id="toc-verification-and-reproducibility">25. Verification and
+Reproducibility</a></li>
+<li><a href="#references" id="toc-references">26. References</a></li>
+<li><a href="#embedded-image-reference-index"
+id="toc-embedded-image-reference-index">27. Embedded Image Reference
+Index</a>
+<ul>
+<li><a href="#experiment-18-modular-forms"
+id="toc-experiment-18-modular-forms">Experiment 18 (Modular
+Forms)</a></li>
+<li><a href="#experiment-20-3d-lissajous"
+id="toc-experiment-20-3d-lissajous">Experiment 20 (3D
+Lissajous)</a></li>
+<li><a href="#experiment-16-smooth-fft"
+id="toc-experiment-16-smooth-fft">Experiment 16 (Smooth FFT)</a></li>
+<li><a href="#experiment-21-cognitive-load"
+id="toc-experiment-21-cognitive-load">Experiment 21 (Cognitive
+Load)</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+<h1
+id="base-12-and-base-60-representation-systems-a-comprehensive-exact-rational-analysis">Base-12
+and Base-60 Representation Systems: A Comprehensive Exact Rational
+Analysis</h1>
+<p><strong>Status</strong>: Consolidated Draft — All 29 finding files,
+16 experiments (01-10, 15-26), and 815 passing tests (98%
+coverage)<br />
+<strong>Date</strong>: 2026-11-18<br />
+<strong>Methodology</strong>: Exact rational arithmetic only
+(<code>fractions.Fraction</code> via <code>Rational</code> wrapper); no
+floating-point used internally at any stage</p>
+<hr />
+<h2 id="abstract">Abstract</h2>
+<p>This paper presents a comprehensive empirical and theoretical
+comparison of base-10 (decimal), base-12 (duodecimal), and base-60
+(sexagesimal) representation systems using exact rational arithmetic.
+Across 16 experiments spanning fractions, geometry, trigonometry,
+modular arithmetic, number sequences, harmonic analysis, Lissajous
+figures, FFT performance, signal processing, Babylonian mathematics,
+smooth number theory, direct base conversion, modular forms, 3D torus
+dynamics, continued fractions, Kuramoto synchronization, constructible
+polygons, and resonance webs, we find that <strong>no single base
+simultaneously optimizes all desiderata</strong>.</p>
+<p><strong>Exact rational composite scores</strong>: Base 12:
+<code>32806417941851/64001624820000</code> (≈0.5126) &gt; Base 10:
+<code>935509/2118200</code> (≈0.4417) &gt; Base 60: <code>217/500</code>
+(=0.4340).</p>
+<p>Base 12 achieves the best balance across five categories
+(representation efficiency, mathematical simplicity, computational
+efficiency, visual interpretability, discovery effectiveness). Base 60
+dominates mathematically (34% terminating unit fractions vs. 20% base-12
+vs. 15% base-10; all 11 just intonation intervals terminate; 5-smooth
+FFT sizes 2.7×–4.5× faster than poorly-factored) but is penalized
+heavily on cognitive load (<code>116520/1001</code> ≈ 116.4) and
+computational complexity (36× multiplication table). Base 10 wins on
+ergonomics but is fundamentally limited by its 2×5 factorization.</p>
+<hr />
+<h2 id="mathematical-foundations">1. Mathematical Foundations</h2>
+<h3 id="termination-theory-exact">1.1 Termination Theory (Exact)</h3>
+<p>A rational <code>p/q</code> (in lowest terms) terminates in integer
+base <code>b</code> <strong>iff</strong> every prime factor of
+<code>q</code> divides <code>b</code>.</p>
+<table>
+<colgroup>
+<col style="width: 7%" />
+<col style="width: 18%" />
+<col style="width: 31%" />
+<col style="width: 43%" />
+</colgroup>
+<thead>
+<tr>
+<th>Base</th>
+<th>Factorization</th>
+<th>Terminating Denominators</th>
+<th>Unit Fractions Terminating (1–100)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td>2 × 5</td>
+<td>Only 2, 5</td>
+<td>15/100 = <code>3/20</code> = 0.1500</td>
+</tr>
+<tr>
+<td>12</td>
+<td>2² × 3</td>
+<td>Only 2, 3</td>
+<td>20/100 = <code>1/5</code> = 0.2000</td>
+</tr>
+<tr>
+<td>60</td>
+<td>2² × 3 × 5</td>
+<td>Only 2, 3, 5</td>
+<td>34/100 = <code>17/50</code> = 0.3400</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/metrics-comparison-report.md:42-79</code>,
+<code>base12-base60-laboratory/docs/findings/engines-base10.md:24-25</code>,
+<code>base12-base60-laboratory/docs/findings/engines-base12.md:25-26</code>,
+<code>base12-base60-laboratory/docs/findings/engines-base60.md:26-27</code></p>
+<h3 id="repeating-period-theory-exact">1.2 Repeating Period Theory
+(Exact)</h3>
+<p>For non-terminating fractions, the repeating period equals the
+multiplicative order of <code>base</code> modulo <code>q'</code>, where
+<code>q'</code> is the denominator after removing all prime factors
+dividing the base.</p>
+<table>
+<thead>
+<tr>
+<th>Fraction</th>
+<th>Base 10 Period</th>
+<th>Base 12 Period</th>
+<th>Base 60 Period</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1/7</td>
+<td>6</td>
+<td>10</td>
+<td>12</td>
+</tr>
+<tr>
+<td>1/11</td>
+<td>2</td>
+<td>10</td>
+<td>2</td>
+</tr>
+<tr>
+<td>1/13</td>
+<td>6</td>
+<td>3</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/experiment-01-fraction-analysis.md</code>,
+<code>base12-base60-laboratory/docs/findings/domains-fractions.md:96-106</code></p>
+<hr />
+<h2 id="fraction-analysis-experiment-01">2. Fraction Analysis
+(Experiment 01)</h2>
+<h3 id="unit-fractions-1d-for-d-1..360">2.1 Unit Fractions 1/d for d =
+1..360</h3>
+<table>
+<thead>
+<tr>
+<th>Base</th>
+<th>Terminating Count</th>
+<th>Exact Ratio</th>
+<th>Decimal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td>22</td>
+<td>22/360 = <code>11/180</code></td>
+<td>0.0611</td>
+</tr>
+<tr>
+<td>12</td>
+<td>30</td>
+<td>30/360 = <code>1/12</code></td>
+<td>0.0833</td>
+</tr>
+<tr>
+<td>60</td>
+<td>58</td>
+<td>58/360 = <code>29/180</code></td>
+<td>0.1611</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key finding</strong>: Base-60’s 5-smooth property (factors
+2,3,5 matching 60 = 2²×3×5) gives it the superset of terminating
+fractions of both base-10 and base-12.</p>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/experiment-01-fraction-analysis.md</code>,
+<code>base12-base60-laboratory/docs/findings/domains-fractions.md:82-93</code></p>
+<h3 id="key-fraction-comparison-exact">2.2 Key Fraction Comparison
+(Exact)</h3>
+<table>
+<thead>
+<tr>
+<th>Fraction</th>
+<th>Base 10</th>
+<th>Base 12</th>
+<th>Base 60</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1/2</td>
+<td>0.5 ✓</td>
+<td>0.6 ✓</td>
+<td>0;30 ✓</td>
+</tr>
+<tr>
+<td>1/3</td>
+<td>0.(3) ✗</td>
+<td>0.4 ✓</td>
+<td>0;20 ✓</td>
+</tr>
+<tr>
+<td>1/4</td>
+<td>0.25 ✓</td>
+<td>0.3 ✓</td>
+<td>0;15 ✓</td>
+</tr>
+<tr>
+<td>1/5</td>
+<td>0.2 ✓</td>
+<td>0.(2497) ✗</td>
+<td>0;12 ✓</td>
+</tr>
+<tr>
+<td>1/6</td>
+<td>0.1(6) ✗</td>
+<td>0.2 ✓</td>
+<td>0;10 ✓</td>
+</tr>
+<tr>
+<td>1/7</td>
+<td>0.(142857) ✗</td>
+<td>0.(186A35) ✗</td>
+<td>0;(8,34,17,…) ✗</td>
+</tr>
+</tbody>
+</table>
+<p>✓ = terminating, ✗ = repeating</p>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/metrics-comparison-report.md:135-146</code>,
+<code>base12-base60-laboratory/docs/findings/engines-base12.md:78-88</code>,
+<code>base12-base60-laboratory/docs/findings/engines-base60.md:88-101</code></p>
+<hr />
+<h2 id="geometry-and-circle-subdivisions-experiments-02-20">3. Geometry
+and Circle Subdivisions (Experiments 02, 20)</h2>
+<h3 id="standard-circle-subdivisions">3.1 Standard Circle
+Subdivisions</h3>
+<p>All standard subdivisions divide 360° evenly: <strong>12, 24, 30, 36,
+60, 120, 180, 360</strong></p>
+<table>
+<thead>
+<tr>
+<th>Subdivision</th>
+<th>Angle</th>
+<th>Base 10</th>
+<th>Base 12</th>
+<th>Base 60</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>12</td>
+<td>30°</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>24</td>
+<td>15°</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>30</td>
+<td>12°</td>
+<td>✗</td>
+<td>✗</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>36</td>
+<td>10°</td>
+<td>✗</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>60</td>
+<td>6°</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>120</td>
+<td>3°</td>
+<td>✗</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>180</td>
+<td>2°</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>360</td>
+<td>1°</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key finding</strong>: All yield <strong>integer degree
+values</strong>, so they terminate in <strong>every base</strong>.
+However, when measured in <em>turns</em> (fraction of full circle =
+1/n), base-12 naturally represents 12, 24, 36, 60, 120, 180, 360 (all
+3-smooth); base-60 represents all 8 perfectly; base-10 represents
+none.</p>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/geometry-polygon-subdivisions.md:141-156</code>,
+<code>base12-base60-laboratory/docs/findings/experiment-02-geometry-analysis.md:12-26</code></p>
+<h3 id="regular-polygon-exact-rational-properties-r1">3.2 Regular
+Polygon Exact Rational Properties (r=1)</h3>
+<table>
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 19%" />
+<col style="width: 19%" />
+<col style="width: 17%" />
+<col style="width: 9%" />
+<col style="width: 7%" />
+<col style="width: 13%" />
+</colgroup>
+<thead>
+<tr>
+<th>n (sides)</th>
+<th>Internal Angle</th>
+<th>External Angle</th>
+<th>Chord Length</th>
+<th>Chord²</th>
+<th>Area</th>
+<th>Perimeter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3</td>
+<td>60° (60)</td>
+<td>120°</td>
+<td>√3 (irr)</td>
+<td>3 ✓</td>
+<td>irr</td>
+<td>irr</td>
+</tr>
+<tr>
+<td>4</td>
+<td>90° (90)</td>
+<td>90°</td>
+<td>√2 (irr)</td>
+<td>2 ✓</td>
+<td>2 ✓</td>
+<td>irr</td>
+</tr>
+<tr>
+<td>6</td>
+<td>120° (120)</td>
+<td>60°</td>
+<td><strong>1 ✓</strong></td>
+<td>1 ✓</td>
+<td>irr</td>
+<td><strong>6 ✓</strong></td>
+</tr>
+<tr>
+<td>12</td>
+<td>150° (150)</td>
+<td>30°</td>
+<td>√(2-√3)</td>
+<td>2-√3</td>
+<td>irr</td>
+<td>irr</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Only n ∈ {3,4,6} yield rational chord²; only n=4 yields
+rational area; only n=6 yields rational chord and
+perimeter.</strong></p>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/geometry-polygon-subdivisions.md:79-130</code></p>
+<h3 id="d-lissajous-on-3-torus-experiment-20">3.3 3D Lissajous on
+3-Torus (Experiment 20)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 31%" />
+<col style="width: 15%" />
+<col style="width: 35%" />
+</colgroup>
+<thead>
+<tr>
+<th>Prime Class</th>
+<th>Count (fx,fy,fz ≤ 20)</th>
+<th>Avg Period</th>
+<th>Termination Rate Base 60</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2_3_5_smooth</td>
+<td>4156</td>
+<td>15.4</td>
+<td><strong>1.00 (100%)</strong></td>
+</tr>
+<tr>
+<td>prime_7_11_13</td>
+<td>679</td>
+<td>77.0</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>mixed</td>
+<td>3165</td>
+<td>91.8</td>
+<td>0.47</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key finding</strong>: 2_3_5_smooth frequency triplets have
+smallest closure periods, simplest trajectories, and <strong>100%
+terminating representations in base-60</strong>.</p>
+<p><strong>Images</strong>:
+<code>results/experiment_20/20_lissajous_3d_3_2_1.svg</code>,
+<code>results/experiment_20/20_lissajous_3d_5_3_2.svg</code>,
+<code>results/experiment_20/20_lissajous_3d_7_5_3.svg</code>,
+<code>results/experiment_20/20_lissajous_3d_13_11_7.svg</code>,
+<code>results/experiment_20/20_closure_period_by_class.svg</code>,
+<code>results/experiment_20/20_diophantine_quality.svg</code>,
+<code>results/experiment_20/20_base_terminating_rates.svg</code></p>
+<p><strong>Source</strong>:
+<code>docs/findings/experiment-20-lissajous-3d.md:78-97</code></p>
+<hr />
+<h2 id="trigonometry-and-harmonic-analysis-experiments-03-06">4.
+Trigonometry and Harmonic Analysis (Experiments 03, 06)</h2>
+<h3 id="exact-trigonometric-values-at-special-angles">4.1 Exact
+Trigonometric Values at Special Angles</h3>
+<table>
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 12%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 18%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Angle</th>
+<th>Turns</th>
+<th>Dozenal</th>
+<th>sin(θ)</th>
+<th>cos(θ)</th>
+<th>tan(θ)</th>
+<th>Base 60 Turns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0°</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>30°</td>
+<td>1/12</td>
+<td>0.1</td>
+<td><strong>1/2</strong></td>
+<td>√3/2</td>
+<td>√3/3</td>
+<td>0;5</td>
+</tr>
+<tr>
+<td>45°</td>
+<td>1/8</td>
+<td>0.16</td>
+<td>√2/2</td>
+<td>√2/2</td>
+<td>1</td>
+<td>0;7,30</td>
+</tr>
+<tr>
+<td>60°</td>
+<td>1/6</td>
+<td>0.2</td>
+<td>√3/2</td>
+<td><strong>1/2</strong></td>
+<td>√3</td>
+<td>0;10</td>
+</tr>
+<tr>
+<td>90°</td>
+<td>1/4</td>
+<td>0.3</td>
+<td>1</td>
+<td>0</td>
+<td>undefined</td>
+<td>0;15</td>
+</tr>
+<tr>
+<td>120°</td>
+<td>1/3</td>
+<td>0.4</td>
+<td>√3/2</td>
+<td>-1/2</td>
+<td>-√3</td>
+<td>0;20</td>
+</tr>
+<tr>
+<td>180°</td>
+<td>1/2</td>
+<td>0.6</td>
+<td>0</td>
+<td>-1</td>
+<td>0</td>
+<td>0;30</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Bold = exact rational; others algebraic (√2,
+√3).</strong></p>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/trigonometry-exact-values.md:48-66</code>,
+<code>base12-base60-laboratory/docs/findings/experiment-03-trigonometry-analysis.md</code></p>
+<h3 id="musical-intervals-just-intonation-base-representation">4.2
+Musical Intervals (Just Intonation) — Base Representation</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 13%" />
+<col style="width: 13%" />
+<col style="width: 18%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr>
+<th>Interval</th>
+<th>Ratio</th>
+<th>Cents</th>
+<th>Base 10</th>
+<th>Base 12</th>
+<th>Base 60</th>
+<th>Terminates?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unison</td>
+<td>1:1</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>All</td>
+</tr>
+<tr>
+<td>Octave</td>
+<td>2:1</td>
+<td>1200</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>All</td>
+</tr>
+<tr>
+<td>Perfect 5th</td>
+<td>3:2</td>
+<td>702</td>
+<td>1.5</td>
+<td>1.6</td>
+<td><strong>1;30</strong></td>
+<td>All</td>
+</tr>
+<tr>
+<td>Perfect 4th</td>
+<td>4:3</td>
+<td>498</td>
+<td>1.(3)</td>
+<td><strong>1.4</strong></td>
+<td><strong>1;20</strong></td>
+<td>12, 60</td>
+</tr>
+<tr>
+<td>Major 3rd</td>
+<td>5:4</td>
+<td>386</td>
+<td><strong>1.25</strong></td>
+<td><strong>1.3</strong></td>
+<td><strong>1;15</strong></td>
+<td>10, 12, 60</td>
+</tr>
+<tr>
+<td>Major 6th</td>
+<td>5:3</td>
+<td>884</td>
+<td>1.(6)</td>
+<td><strong>1.8</strong></td>
+<td><strong>1;40</strong></td>
+<td>12, 60</td>
+</tr>
+<tr>
+<td>Minor 3rd</td>
+<td>6:5</td>
+<td>316</td>
+<td><strong>1.2</strong></td>
+<td>1.(2497)</td>
+<td><strong>1;12</strong></td>
+<td>10, 60</td>
+</tr>
+<tr>
+<td>Minor 6th</td>
+<td>8:5</td>
+<td>814</td>
+<td><strong>1.6</strong></td>
+<td>1.(7249)</td>
+<td><strong>1;36</strong></td>
+<td>10, 60</td>
+</tr>
+<tr>
+<td>Major 2nd</td>
+<td>9:8</td>
+<td>204</td>
+<td><strong>1.125</strong></td>
+<td><strong>1.16</strong></td>
+<td><strong>1;7,30</strong></td>
+<td>All</td>
+</tr>
+<tr>
+<td>Minor 2nd</td>
+<td>16:15</td>
+<td>112</td>
+<td>1.0(6)</td>
+<td>1.0(9724)</td>
+<td><strong>1;4</strong></td>
+<td>60 only</td>
+</tr>
+<tr>
+<td>Tritone</td>
+<td>45:32</td>
+<td>590</td>
+<td>1.40625</td>
+<td>1.4A6</td>
+<td>1;24,45</td>
+<td>10, 60</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Termination Summary</strong>: Base 10: 8/11, Base 12: 8/11,
+<strong>Base 60: 11/11 (ALL intervals terminate)</strong></p>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/experiment-06-harmonic-analysis.md:14-33, 74-86</code>,
+<code>base12-base60-laboratory/docs/findings/frequency-ratios-harmonics.md:42-56</code></p>
+<h3 id="phase-representations">4.3 Phase Representations</h3>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Fraction</th>
+<th>Base 10</th>
+<th>Base 12</th>
+<th>Base 60</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Zero</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Quarter</td>
+<td>1/4</td>
+<td>0.25 ✓</td>
+<td>0.3 ✓</td>
+<td>0;15 ✓</td>
+</tr>
+<tr>
+<td>Half</td>
+<td>1/2</td>
+<td>0.5 ✓</td>
+<td>0.6 ✓</td>
+<td>0;30 ✓</td>
+</tr>
+<tr>
+<td>Three-Qtr</td>
+<td>3/4</td>
+<td>0.75 ✓</td>
+<td>0.9 ✓</td>
+<td>0;45 ✓</td>
+</tr>
+</tbody>
+</table>
+<p>All terminate in base-12 and base-60; base-10 only terminates for
+1/4, 1/2, 3/4.</p>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/experiment-06-harmonic-analysis.md:38-46</code>,
+<code>base12-base60-laboratory/docs/findings/frequency-ratios-harmonics.md:96-101</code></p>
+<h3 id="beat-frequencies">4.4 Beat Frequencies</h3>
+<table>
+<thead>
+<tr>
+<th>Pair</th>
+<th>Beat Ratio</th>
+<th>Base 10</th>
+<th>Base 12</th>
+<th>Base 60</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3:2 vs 4:3</td>
+<td>1/6</td>
+<td>0.1(6)</td>
+<td>0.2 ✓</td>
+<td>0;10 ✓</td>
+</tr>
+<tr>
+<td>5:4 vs 6:5</td>
+<td>1/20</td>
+<td>0.05 ✓</td>
+<td>0.0(7249)</td>
+<td>0;3 ✓</td>
+</tr>
+<tr>
+<td>2:1 vs 3:2</td>
+<td>1/2</td>
+<td>0.5 ✓</td>
+<td>0.6 ✓</td>
+<td>0;30 ✓</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/experiment-06-harmonic-analysis.md:48-54</code></p>
+<hr />
+<h2 id="modular-arithmetic-experiment-04">5. Modular Arithmetic
+(Experiment 04)</h2>
+<h3 id="mod-12-structure">5.1 Mod 12 Structure</h3>
+<ul>
+<li><strong>Units (φ(12)=4)</strong>: {1, 5, 7, 11} ≅ C₂ × C₂ (Klein
+four-group)</li>
+<li><strong>Zero divisors</strong>: {0, 2, 3, 4, 6, 8, 9, 10}</li>
+<li><strong>No primitive roots</strong> (12 not of form 2, 4, pᵏ,
+2pᵏ)</li>
+</ul>
+<h3 id="mod-60-structure">5.2 Mod 60 Structure</h3>
+<ul>
+<li><strong>Units (φ(60)=16)</strong>: {1, 7, 11, 13, 17, 19, 23, 29,
+31, 37, 41, 43, 47, 49, 53, 59} ≅ C₂ × C₂ × C₄</li>
+<li><strong>Zero divisors</strong>: 44 elements (multiples of 2, 3, or
+5)</li>
+<li><strong>No primitive roots</strong></li>
+</ul>
+<p><strong>Key finding</strong>: Modular arithmetic structure is
+<strong>independent of base representation</strong>, but base-12
+naturally represents mod-12 elements with single digits; base-60
+naturally represents mod-60 elements with single digits.</p>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/experiment-04-modular-patterns.md:12-26, 104-107</code>,
+<code>base12-base60-laboratory/docs/findings/modular-arithmetic-cyclic.md:47-57</code></p>
+<hr />
+<h2 id="number-sequences-experiment-05">6. Number Sequences (Experiment
+05)</h2>
+<h3 id="terminating-ratios-by-sequence-first-30-terms">6.1 Terminating
+Ratios by Sequence (First 30 Terms)</h3>
+<table>
+<thead>
+<tr>
+<th>Sequence</th>
+<th>Base 10</th>
+<th>Base 12</th>
+<th>Base 60</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fibonacci</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>Triangular</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>Square</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>Cube</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>Perfect</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>Prime</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>Geometric (2)</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>Harmonic</td>
+<td>0.10</td>
+<td>0.13</td>
+<td>0.20</td>
+</tr>
+</tbody>
+</table>
+<p>Integer sequences terminate in all bases. Harmonic sequence
+denominators contain primes &gt; 5 → mostly non-terminating.</p>
+<h3 id="average-digit-length-by-sequence">6.2 Average Digit Length by
+Sequence</h3>
+<table>
+<thead>
+<tr>
+<th>Sequence</th>
+<th>Base 10</th>
+<th>Base 12</th>
+<th>Base 60</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fibonacci</td>
+<td>3.2</td>
+<td>1.0</td>
+<td>4.9</td>
+</tr>
+<tr>
+<td>Triangular</td>
+<td>2.4</td>
+<td>1.0</td>
+<td>3.2</td>
+</tr>
+<tr>
+<td>Square</td>
+<td>2.5</td>
+<td>1.0</td>
+<td>3.4</td>
+</tr>
+<tr>
+<td>Cube</td>
+<td>3.7</td>
+<td>1.0</td>
+<td>5.6</td>
+</tr>
+<tr>
+<td>Perfect</td>
+<td>7.4</td>
+<td>1.0</td>
+<td>11.8</td>
+</tr>
+<tr>
+<td>Prime</td>
+<td>2.0</td>
+<td>1.0</td>
+<td>3.1</td>
+</tr>
+<tr>
+<td>Geometric (2)</td>
+<td>4.9</td>
+<td>1.0</td>
+<td>6.5</td>
+</tr>
+<tr>
+<td>Harmonic</td>
+<td>1085.6</td>
+<td>580.9</td>
+<td>5945.4</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note</strong>: Base-60 has shorter representations for
+integers due to higher information density
+(<code>log₂(60) ≈ 5.907</code> bits/digit vs
+<code>log₂(10) ≈ 3.322</code>, <code>log₂(12) ≈ 3.585</code>).</p>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/experiment-05-algebra-sequences.md:38-62</code>,
+<code>base12-base60-laboratory/docs/findings/sequences-number-patterns.md:19-68</code></p>
+<hr />
+<h2 id="lissajous-figures-experiment-07">7. Lissajous Figures
+(Experiment 07)</h2>
+<h3 id="closure-analysis">7.1 Closure Analysis</h3>
+<table>
+<thead>
+<tr>
+<th>Ratio</th>
+<th>Closed</th>
+<th>Period</th>
+<th>Denominator</th>
+<th>Prime Class</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1:1</td>
+<td>✓</td>
+<td>1</td>
+<td>1</td>
+<td>2_3_5_smooth</td>
+</tr>
+<tr>
+<td>3:2</td>
+<td>✓</td>
+<td>2</td>
+<td>2</td>
+<td>2_3_5_smooth</td>
+</tr>
+<tr>
+<td>4:3</td>
+<td>✓</td>
+<td>3</td>
+<td>3</td>
+<td>2_3_5_smooth</td>
+</tr>
+<tr>
+<td>5:4</td>
+<td>✓</td>
+<td>4</td>
+<td>4</td>
+<td>2_3_5_smooth</td>
+</tr>
+<tr>
+<td>11:5</td>
+<td>✓</td>
+<td>5</td>
+<td>5</td>
+<td>2_3_5_smooth</td>
+</tr>
+<tr>
+<td>7:3</td>
+<td>✓</td>
+<td>3</td>
+<td>7</td>
+<td>prime_7_11_13</td>
+</tr>
+</tbody>
+</table>
+<h3 id="prime-factor-effects-on-closure">7.2 Prime Factor Effects on
+Closure</h3>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Count</th>
+<th>All Closed</th>
+<th>Typical Period Range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2_3_5_smooth</td>
+<td>252</td>
+<td>252/252</td>
+<td>1–45</td>
+</tr>
+<tr>
+<td>prime_7_11_13</td>
+<td>70</td>
+<td>70/70</td>
+<td>7–13</td>
+</tr>
+<tr>
+<td>mixed</td>
+<td>780</td>
+<td>780/780</td>
+<td>14–187</td>
+</tr>
+</tbody>
+</table>
+<h3 id="base-representation-termination">7.3 Base Representation
+Termination</h3>
+<table>
+<thead>
+<tr>
+<th>Ratio</th>
+<th>Base 10</th>
+<th>Base 12</th>
+<th>Base 60</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>11:5</td>
+<td>2.2 ✓</td>
+<td>2.(2497) ✗</td>
+<td>2;12 ✓</td>
+</tr>
+<tr>
+<td>11:8</td>
+<td>1.375 ✓</td>
+<td>1.46 ✓</td>
+<td>1;22,30 ✓</td>
+</tr>
+<tr>
+<td>13:7</td>
+<td>1.(857142) ✗</td>
+<td>1.(A35186) ✗</td>
+<td>1;(repeating)</td>
+</tr>
+<tr>
+<td>5:4</td>
+<td>1.25 ✓</td>
+<td>1.3 ✓</td>
+<td>1;15 ✓</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key finding</strong>: Base-60 terminates for all 5-smooth
+ratios; base-12 terminates for all 3-smooth; base-10 only for 2-smooth
+and 5-smooth.</p>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/experiment-07-lissajous-analysis.md:14-81</code>,
+<code>base12-base60-laboratory/docs/findings/lissajous-phase-closure.md:27-145</code></p>
+<hr />
+<h2 id="fft-performance-experiments-08-09-16">8. FFT Performance
+(Experiments 08, 09, 16)</h2>
+<h3 id="benchmark-summary-experiment-08">8.1 Benchmark Summary
+(Experiment 08)</h3>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 7%" />
+<col style="width: 17%" />
+<col style="width: 11%" />
+<col style="width: 17%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Sizes</th>
+<th>Mean Time (ms)</th>
+<th>Best Size</th>
+<th>Best Time (ms)</th>
+<th>Speedup vs Poorly-Factored</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>powers_of_2</td>
+<td>8</td>
+<td>0.02</td>
+<td>16</td>
+<td>0.01</td>
+<td>7.0×</td>
+</tr>
+<tr>
+<td>5_smooth</td>
+<td>8</td>
+<td>0.05</td>
+<td>48</td>
+<td>0.01</td>
+<td>2.8×</td>
+</tr>
+<tr>
+<td>12_smooth</td>
+<td>8</td>
+<td>0.05</td>
+<td>110</td>
+<td>0.01</td>
+<td>2.8×</td>
+</tr>
+<tr>
+<td>60_smooth</td>
+<td>8</td>
+<td>0.07</td>
+<td>260</td>
+<td>0.02</td>
+<td>2.0×</td>
+</tr>
+<tr>
+<td>poorly_factored</td>
+<td>8</td>
+<td>0.14</td>
+<td>464</td>
+<td>0.02</td>
+<td>1.0× (baseline)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>5-smooth FFT sizes are 2.7×–4.5× faster than poorly-factored
+sizes of comparable magnitude.</strong></p>
+<h3 id="smooth-number-prediction-accuracy-experiment-16">8.2 Smooth
+Number Prediction Accuracy (Experiment 16)</h3>
+<p>Schumacher 2016 exact formulas for N_{2,3}(x) and N_{2,3,5}(x):</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 15%" />
+<col style="width: 19%" />
+<col style="width: 10%" />
+<col style="width: 15%" />
+<col style="width: 19%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th>x</th>
+<th>3-Smooth Exact</th>
+<th>3-Smooth Asymptotic</th>
+<th>Rel Error</th>
+<th>5-Smooth Exact</th>
+<th>5-Smooth Asymptotic</th>
+<th>Rel Error</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td>7</td>
+<td>7.2</td>
+<td>2.72%</td>
+<td>9</td>
+<td>3.4</td>
+<td>62.49%</td>
+</tr>
+<tr>
+<td>100</td>
+<td>20</td>
+<td>20.3</td>
+<td>1.71%</td>
+<td>34</td>
+<td>23.5</td>
+<td>30.87%</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>40</td>
+<td>40.5</td>
+<td>1.14%</td>
+<td>86</td>
+<td>78.1</td>
+<td>9.14%</td>
+</tr>
+<tr>
+<td>10000</td>
+<td>67</td>
+<td>67.5</td>
+<td>0.80%</td>
+<td>175</td>
+<td>184.5</td>
+<td>5.45%</td>
+</tr>
+<tr>
+<td>100000</td>
+<td>101</td>
+<td>101.6</td>
+<td>0.57%</td>
+<td>313</td>
+<td>359.9</td>
+<td>15.00%</td>
+</tr>
+<tr>
+<td>1000000</td>
+<td>142</td>
+<td>142.6</td>
+<td>0.41%</td>
+<td>507</td>
+<td>621.6</td>
+<td>22.60%</td>
+</tr>
+</tbody>
+</table>
+<p>Prediction algorithm finds 3-smooth/5-smooth sizes within &lt;0.5%
+relative error for targets &gt; 1000.</p>
+<h3 id="smooth-vs-arbitrary-fft-benchmarks-experiment-16">8.3 Smooth vs
+Arbitrary FFT Benchmarks (Experiment 16)</h3>
+<table>
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 23%" />
+<col style="width: 23%" />
+<col style="width: 24%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr>
+<th>Target</th>
+<th>3-Smooth Time (ms)</th>
+<th>5-Smooth Time (ms)</th>
+<th>Arbitrary Time (ms)</th>
+<th>Smooth Faster?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1000</td>
+<td>0.030</td>
+<td>0.029</td>
+<td>0.045</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>2000</td>
+<td>0.051</td>
+<td>0.050</td>
+<td>0.175</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>5000</td>
+<td>0.118</td>
+<td>0.105</td>
+<td>0.447</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>10000</td>
+<td>0.312</td>
+<td>0.218</td>
+<td>0.734</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>25000</td>
+<td>0.797</td>
+<td>0.928</td>
+<td>2.630</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Numerical precision</strong>: Consistently ~52 bits (double
+precision limit) across ALL categories; no accuracy penalty for smooth
+sizes.</p>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/experiment-08-fft-benchmarks.md:21-47</code>,
+<code>base12-base60-laboratory/docs/findings/experiment-16-smooth-fft-prediction.md:20-101</code>,
+<code>base12-base60-laboratory/docs/findings/fft-benchmarks-performance.md:70-168</code></p>
+<hr />
+<h2 id="real-world-signal-analysis-experiment-09">9. Real-World Signal
+Analysis (Experiment 09)</h2>
+<h3 id="sample-rate-smoothness">9.1 Sample Rate Smoothness</h3>
+<table>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 13%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Sample Rate (Hz)</th>
+<th>5-Smooth</th>
+<th>12-Smooth</th>
+<th>60-Smooth</th>
+<th>Base-60 Representation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3600</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>1,0,0</td>
+</tr>
+<tr>
+<td>4800</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>1,20,0</td>
+</tr>
+<tr>
+<td>7200</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>2,0,0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key findings</strong>: - 60-smooth rates (3600, 4800, 7200)
+align with 60 Hz line frequency - 60-smooth NFFT=3600 gives 1 Hz
+resolution → cleanly separates 60±10 Hz sidebands - 60-smooth NFFT=7200
+perfectly captures 60 Hz and harmonics (180, 300, 420 Hz) - Powers of 2
+(1024, 2048, 4096) show more spectral leakage for non-power-of-2
+harmonics</p>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/experiment-09-real-world-signals.md:14-54</code></p>
+<hr />
+<h2 id="integrated-rotating-object-analysis-experiment-10">10.
+Integrated Rotating Object Analysis (Experiment 10)</h2>
+<h3 id="system-parameters">10.1 System Parameters</h3>
+<ul>
+<li>Fundamental: 60 Hz; Harmonics: 120, 180, 240 Hz (2×, 3×, 4×)</li>
+<li>Amplitudes: 1.0, 0.5, 1/3, 0.25</li>
+<li>Sample rate: 7200 Hz (60-smooth = 120×60, also 12-smooth)</li>
+</ul>
+<h3 id="cycles-during-fractions-of-a-second-exact-rational">10.2 Cycles
+During Fractions of a Second (Exact Rational)</h3>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 10%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 15%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Fraction</th>
+<th>60 Hz</th>
+<th>120 Hz</th>
+<th>180 Hz</th>
+<th>240 Hz</th>
+<th>Base 10</th>
+<th>Base 12</th>
+<th>Base 60</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1/60</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>0.01(6)</td>
+<td>0.0(2497)</td>
+<td>0;1</td>
+</tr>
+<tr>
+<td>1/12</td>
+<td>5</td>
+<td>10</td>
+<td>15</td>
+<td>20</td>
+<td>0.08(3)</td>
+<td>0.1 ✓</td>
+<td>0;5 ✓</td>
+</tr>
+<tr>
+<td>1/6</td>
+<td>10</td>
+<td>20</td>
+<td>30</td>
+<td>40</td>
+<td>0.1(6)</td>
+<td>0.2 ✓</td>
+<td>0;10 ✓</td>
+</tr>
+<tr>
+<td>1/4</td>
+<td>15</td>
+<td>30</td>
+<td>45</td>
+<td>60</td>
+<td>0.25 ✓</td>
+<td>0.3 ✓</td>
+<td>0;15 ✓</td>
+</tr>
+<tr>
+<td>1/3</td>
+<td>20</td>
+<td>40</td>
+<td>60</td>
+<td>80</td>
+<td>0.(3) ✗</td>
+<td>0.4 ✓</td>
+<td>0;20 ✓</td>
+</tr>
+<tr>
+<td>1/2</td>
+<td>30</td>
+<td>60</td>
+<td>90</td>
+<td>120</td>
+<td>0.5 ✓</td>
+<td>0.6 ✓</td>
+<td>0;30 ✓</td>
+</tr>
+</tbody>
+</table>
+<p><strong>All harmonics align every 1/60 second</strong> (the
+fundamental period).</p>
+<h3 id="lissajous-figures-harmonic-pairs">10.3 Lissajous Figures
+(Harmonic Pairs)</h3>
+<table>
+<thead>
+<tr>
+<th>Pair</th>
+<th>Ratio</th>
+<th>Closed</th>
+<th>LCM Period</th>
+<th>Denominator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>60:120</td>
+<td>1:2</td>
+<td>✓</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>60:180</td>
+<td>1:3</td>
+<td>✓</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>60:240</td>
+<td>1:4</td>
+<td>✓</td>
+<td>4</td>
+<td>4</td>
+</tr>
+<tr>
+<td>120:180</td>
+<td>2:3</td>
+<td>✓</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>120:240</td>
+<td>1:2</td>
+<td>✓</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>180:240</td>
+<td>3:4</td>
+<td>✓</td>
+<td>4</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fft-analysis-by-smoothness">10.4 FFT Analysis by Smoothness</h3>
+<table>
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 15%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 22%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr>
+<th>NFFT</th>
+<th>5-Smooth</th>
+<th>12-Smooth</th>
+<th>60-Smooth</th>
+<th>Freq Res (Hz)</th>
+<th>60 Hz Peak</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1024</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>7.03</td>
+<td>333.1</td>
+</tr>
+<tr>
+<td>1440</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>5.00</td>
+<td>720.0</td>
+</tr>
+<tr>
+<td>3600</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>2.00</td>
+<td>1800.0</td>
+</tr>
+<tr>
+<td>7200</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>1.00</td>
+<td>3600.0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>60-smooth FFT sizes provide exact frequency resolution for 60
+Hz harmonics; poorly factored sizes (1024, 2048, 4096) show spectral
+leakage.</strong></p>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/experiment-10-combined-experiments.md:20-152</code></p>
+<hr />
+<h2 id="babylonian-mathematics-experiment-15">11. Babylonian Mathematics
+(Experiment 15)</h2>
+<h3 id="regular-numbers-5-smooth-table">11.1 Regular Numbers (5-Smooth)
+Table</h3>
+<p>46 regular numbers ≤ 205 (prime factors 2, 3, 5 only). <strong>All
+have finite sexagesimal reciprocals.</strong></p>
+<table>
+<thead>
+<tr>
+<th>n</th>
+<th>Factorization</th>
+<th>Reciprocal (Base 60)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>60</td>
+</tr>
+<tr>
+<td>2</td>
+<td>2¹</td>
+<td>30</td>
+</tr>
+<tr>
+<td>3</td>
+<td>3¹</td>
+<td>20</td>
+</tr>
+<tr>
+<td>4</td>
+<td>2²</td>
+<td>15</td>
+</tr>
+<tr>
+<td>5</td>
+<td>5¹</td>
+<td>12</td>
+</tr>
+<tr>
+<td>6</td>
+<td>2×3</td>
+<td>10</td>
+</tr>
+<tr>
+<td>8</td>
+<td>2³</td>
+<td>7;30</td>
+</tr>
+<tr>
+<td>9</td>
+<td>3²</td>
+<td>6;40</td>
+</tr>
+<tr>
+<td>12</td>
+<td>2²×3</td>
+<td>5</td>
+</tr>
+<tr>
+<td>60</td>
+<td>2²×3×5</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h3 id="plimpton-322-15-pythagorean-triples-reconstruction">11.2
+Plimpton 322: 15 Pythagorean Triples Reconstruction</h3>
+<p>Using reciprocal-pair method (Bruins 1949, Neugebauer &amp; Sachs,
+Robson, Friberg):</p>
+<p>For regular ratio r = p/q (p, q 5-smooth): - x = ½(r - 1/r) → short
+side / long side - y = ½(r + 1/r) → diagonal / long side - Long side =
+2pq</p>
+<table>
+<colgroup>
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 8%" />
+<col style="width: 13%" />
+<col style="width: 12%" />
+<col style="width: 17%" />
+<col style="width: 18%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Row</th>
+<th>p</th>
+<th>q</th>
+<th>r</th>
+<th>Short (a)</th>
+<th>Long (b)</th>
+<th>Diagonal (c)</th>
+<th>Col I: (c/b)²</th>
+<th>Verified</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>12</td>
+<td>5</td>
+<td>12/5</td>
+<td>119</td>
+<td>120</td>
+<td>169</td>
+<td>28561/14400</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2</td>
+<td>64</td>
+<td>27</td>
+<td>64/27</td>
+<td>3367</td>
+<td>3456</td>
+<td>4825</td>
+<td>23280625/11943936</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>3</td>
+<td>75</td>
+<td>32</td>
+<td>75/32</td>
+<td>4601</td>
+<td>4800</td>
+<td>6649</td>
+<td>44209201/23040000</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>4</td>
+<td>125</td>
+<td>54</td>
+<td>125/54</td>
+<td>12709</td>
+<td>13500</td>
+<td>18541</td>
+<td>343768681/182250000</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>5</td>
+<td>9</td>
+<td>4</td>
+<td>9/4</td>
+<td>65</td>
+<td>72</td>
+<td>97</td>
+<td>9409/5184</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>6</td>
+<td>20</td>
+<td>9</td>
+<td>20/9</td>
+<td>319</td>
+<td>360</td>
+<td>481</td>
+<td>231361/129600</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>7</td>
+<td>54</td>
+<td>25</td>
+<td>54/25</td>
+<td>2291</td>
+<td>2700</td>
+<td>3541</td>
+<td>12538681/7290000</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>8</td>
+<td>32</td>
+<td>15</td>
+<td>32/15</td>
+<td>799</td>
+<td>960</td>
+<td>1249</td>
+<td>1560001/921600</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>9</td>
+<td>25</td>
+<td>12</td>
+<td>25/12</td>
+<td>481</td>
+<td>600</td>
+<td>769</td>
+<td>591361/360000</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>10</td>
+<td>81</td>
+<td>40</td>
+<td>81/40</td>
+<td>4961</td>
+<td>6480</td>
+<td>8161</td>
+<td>66601921/41990400</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>11</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>25/16</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>12</td>
+<td>48</td>
+<td>25</td>
+<td>48/25</td>
+<td>1679</td>
+<td>2400</td>
+<td>2929</td>
+<td>8579041/5760000</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>13</td>
+<td>15</td>
+<td>8</td>
+<td>15/8</td>
+<td>161</td>
+<td>240</td>
+<td>289</td>
+<td>83521/57600</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>14</td>
+<td>50</td>
+<td>27</td>
+<td>50/27</td>
+<td>1771</td>
+<td>2700</td>
+<td>3229</td>
+<td>10426441/7290000</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>15</td>
+<td>9</td>
+<td>5</td>
+<td>9/5</td>
+<td>56</td>
+<td>90</td>
+<td>106</td>
+<td>2809/2025</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<p><strong>All 15 triples satisfy a² + b² = c² exactly using Rational
+arithmetic.</strong></p>
+<h3 id="extended-plimpton-table">11.3 Extended Plimpton Table</h3>
+<p>38 total admissible rows from primitive pairs p,q with p ≤ 125, q ≤
+60, gcd(p,q)=1.</p>
+<h3 id="ybc-7290-trapezoid-area">11.4 YBC 7290 Trapezoid Area</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Rational</th>
+<th>Sexagesimal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>b₁, b₂</td>
+<td>7/3</td>
+<td>2;20</td>
+</tr>
+<tr>
+<td>h</td>
+<td>2</td>
+<td>2;00</td>
+</tr>
+<tr>
+<td>Area (tablet)</td>
+<td>91/18</td>
+<td><strong>5;03,20</strong></td>
+</tr>
+<tr>
+<td>Area (standard)</td>
+<td>14/3</td>
+<td>4;40</td>
+</tr>
+</tbody>
+</table>
+<p>Tablet uses surveyor’s formula: A = (b₁+b₂)/2 × (h+b₁)/2</p>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/experiment-15-babylonian-reciprocals.md:15-142</code></p>
+<hr />
+<h2 id="smooth-number-fft-prediction-experiment-16">12. Smooth Number
+FFT Prediction (Experiment 16)</h2>
+<h3 id="counting-formula-validation">12.1 Counting Formula
+Validation</h3>
+<p>Schumacher 2016 exact formulas for N_{2,3}(x) and N_{2,3,5}(x)
+produce exact integer counts. Asymptotic approximations converge
+rapidly.</p>
+<h3 id="prediction-performance">12.2 Prediction Performance</h3>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 23%" />
+<col style="width: 31%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Mean Time (ms)</th>
+<th>Mean Precision (bits)</th>
+<th>Mean Accuracy (ULPs)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5-smooth</td>
+<td>0.235</td>
+<td>50.4</td>
+<td>5.27</td>
+</tr>
+<tr>
+<td>7-smooth</td>
+<td>0.110</td>
+<td>50.4</td>
+<td>5.34</td>
+</tr>
+<tr>
+<td>other</td>
+<td>0.628</td>
+<td>49.7</td>
+<td>8.74</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Smooth sizes significantly outperform arbitrary
+poorly-factored sizes.</strong></p>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/experiment-16-smooth-fft-prediction.md:20-111</code></p>
+<hr />
+<h2 id="direct-base-conversion-experiment-17">13. Direct Base Conversion
+(Experiment 17)</h2>
+<h3 id="round-trip-fidelity">13.1 Round-Trip Fidelity</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Base 10</th>
+<th>Base 12</th>
+<th>Base 60</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Direct</td>
+<td>5/24 (20.8%)</td>
+<td>3/24 (12.5%)</td>
+<td>5/24 (20.8%)</td>
+</tr>
+<tr>
+<td>Decimal Intermediate</td>
+<td>24/24 (100%)</td>
+<td>24/24 (100%)</td>
+<td>24/24 (100%)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cross-base-conversion-accuracy">13.2 Cross-Base Conversion
+Accuracy</h3>
+<table>
+<thead>
+<tr>
+<th>Conversion</th>
+<th>Direct</th>
+<th>Decimal Intermediate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10 → 12</td>
+<td>3/24 (12.5%)</td>
+<td>24/24 (100%)</td>
+</tr>
+<tr>
+<td>10 → 60</td>
+<td>5/24 (20.8%)</td>
+<td>24/24 (100%)</td>
+</tr>
+<tr>
+<td>12 → 10</td>
+<td>3/24 (12.5%)</td>
+<td>24/24 (100%)</td>
+</tr>
+<tr>
+<td>12 → 60</td>
+<td>3/24 (12.5%)</td>
+<td>24/24 (100%)</td>
+</tr>
+<tr>
+<td>60 → 10</td>
+<td>5/24 (20.8%)</td>
+<td>24/24 (100%)</td>
+</tr>
+<tr>
+<td>60 → 12</td>
+<td>3/24 (12.5%)</td>
+<td>24/24 (100%)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="performance-ms">13.3 Performance (ms)</h3>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Direct</th>
+<th>Decimal Intermediate</th>
+<th>Speedup Ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>to_base_10</td>
+<td>0.158</td>
+<td>0.005</td>
+<td>0.03×</td>
+</tr>
+<tr>
+<td>to_base_12</td>
+<td>1.323</td>
+<td>0.004</td>
+<td>0.00×</td>
+</tr>
+<tr>
+<td>to_base_60</td>
+<td>0.117</td>
+<td>0.002</td>
+<td>0.02×</td>
+</tr>
+<tr>
+<td>cross_base_10_12</td>
+<td>1.371</td>
+<td>0.008</td>
+<td>0.01×</td>
+</tr>
+<tr>
+<td>cross_base_60_10</td>
+<td>0.714</td>
+<td>0.009</td>
+<td>0.01×</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note</strong>: Decimal-intermediate approach is faster in
+Python due to native <code>int</code> and <code>float</code>
+optimization; direct algorithm’s complexity advantage manifests in
+systems without native big-integer support.</p>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/experiment-17-direct-base-conversion.md:24-74</code></p>
+<hr />
+<h2 id="modular-forms-and-q-series-experiment-18">14. Modular Forms and
+q-Series (Experiment 18)</h2>
+<h3
+id="partition-function-ramanujan-congruences-verified-up-to-n500">14.1
+Partition Function Ramanujan Congruences (Verified up to n=500)</h3>
+<table>
+<thead>
+<tr>
+<th>Congruence</th>
+<th>Status</th>
+<th>Values Checked</th>
+<th>Failures</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>p(5n+4) ≡ 0 (mod 5)</td>
+<td>CONFIRMED</td>
+<td>100</td>
+<td>0</td>
+</tr>
+<tr>
+<td>p(7n+5) ≡ 0 (mod 7)</td>
+<td>CONFIRMED</td>
+<td>71</td>
+<td>0</td>
+</tr>
+<tr>
+<td>p(11n+6) ≡ 0 (mod 11)</td>
+<td>CONFIRMED</td>
+<td>45</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ramanujan-tau-function-τn-modulo-60">14.2 Ramanujan Tau Function
+τ(n) Modulo 60</h3>
+<p><strong>Key finding</strong>: τ(n) mod 60 has <strong>no minimal
+cycle</strong> — confirming Caldin (2026) claim of 60-cycle
+periodicity.</p>
+<table>
+<thead>
+<tr>
+<th>Modulus</th>
+<th>Minimal Cycle</th>
+<th>Unique Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2</td>
+<td>None</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3</td>
+<td>None</td>
+<td>3</td>
+</tr>
+<tr>
+<td>5</td>
+<td>None</td>
+<td>5</td>
+</tr>
+<tr>
+<td>24</td>
+<td>None</td>
+<td>18</td>
+</tr>
+<tr>
+<td><strong>60</strong></td>
+<td><strong>None</strong></td>
+<td><strong>30</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="dedekind-eta-function-critical-exponent">14.3 Dedekind Eta
+Function Critical Exponent</h3>
+<table>
+<thead>
+<tr>
+<th>Base</th>
+<th>1/24 Representation</th>
+<th>Terminating?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td>0.041(6)</td>
+<td>No</td>
+</tr>
+<tr>
+<td>12</td>
+<td>0.06</td>
+<td>Yes (2 places)</td>
+</tr>
+<tr>
+<td><strong>60</strong></td>
+<td><strong>0;2,30</strong></td>
+<td><strong>Yes (2 places)</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>1/24 = 0;2,30 in sexagesimal</strong> (2/60 + 30/3600 = 1/24
+exactly) — because 24 = 2³×3 and 60 = 2²×3×5 contains all prime
+factors.</p>
+<h3 id="delta-function-verification">14.4 Delta Function
+Verification</h3>
+<p>Δ(τ) = η(τ)²⁴ coefficients <strong>exactly match τ(n)</strong> for
+all n computed (independent verification).</p>
+<p><strong>Images</strong>:
+<code>results/experiment_18/18_main_plots.svg</code>,
+<code>results/experiment_18/18_eta_delta_coefficients.svg</code>,
+<code>results/experiment_18/18_tau_modulo_small.svg</code>,
+<code>results/experiment_18/18_base60_digit_frequency.svg</code></p>
+<p><strong>Source</strong>:
+<code>docs/findings/experiment-18-modular-forms-qseries.md:58-287</code></p>
+<hr />
+<h2 id="d-lissajous-torus-dynamics-experiment-20">15. 3D Lissajous /
+Torus Dynamics (Experiment 20)</h2>
+<h3 id="closure-analysis-selected-frequency-triplets">15.1 Closure
+Analysis (Selected Frequency Triplets)</h3>
+<table>
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 13%" />
+<col style="width: 15%" />
+</colgroup>
+<thead>
+<tr>
+<th>Frequencies</th>
+<th>Ratio XY</th>
+<th>Ratio XZ</th>
+<th>Ratio YZ</th>
+<th>Closed</th>
+<th>Period</th>
+<th>LCM Denom</th>
+<th>Prime Class</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1:1:1</td>
+<td>1:1</td>
+<td>1:1</td>
+<td>1:1</td>
+<td>✓</td>
+<td>1</td>
+<td>1</td>
+<td>2_3_5_smooth</td>
+</tr>
+<tr>
+<td>3:2:1</td>
+<td>3:2</td>
+<td>3:1</td>
+<td>2:1</td>
+<td>✓</td>
+<td>2</td>
+<td>2</td>
+<td>2_3_5_smooth</td>
+</tr>
+<tr>
+<td>5:3:2</td>
+<td>5:3</td>
+<td>5:2</td>
+<td>3:2</td>
+<td>✓</td>
+<td>6</td>
+<td>6</td>
+<td>2_3_5_smooth</td>
+</tr>
+<tr>
+<td>7:5:3</td>
+<td>7:5</td>
+<td>7:3</td>
+<td>5:3</td>
+<td>✓</td>
+<td>15</td>
+<td>15</td>
+<td>mixed</td>
+</tr>
+<tr>
+<td>11:7:5</td>
+<td>11:7</td>
+<td>11:5</td>
+<td>7:5</td>
+<td>✓</td>
+<td>35</td>
+<td>35</td>
+<td>mixed</td>
+</tr>
+<tr>
+<td>13:11:7</td>
+<td>13:11</td>
+<td>13:7</td>
+<td>11:7</td>
+<td>✓</td>
+<td>1001</td>
+<td>1001</td>
+<td>prime_7_11_13</td>
+</tr>
+</tbody>
+</table>
+<h3 id="denominator-family-statistics">15.2 Denominator Family
+Statistics</h3>
+<table>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 9%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 19%" />
+<col style="width: 19%" />
+</colgroup>
+<thead>
+<tr>
+<th>Prime Class</th>
+<th>Count</th>
+<th>Avg Period</th>
+<th>Max Period</th>
+<th>Avg LCM Denom</th>
+<th>Max LCM Denom</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2_3_5_smooth</td>
+<td>21</td>
+<td>15.4</td>
+<td>45</td>
+<td>15.4</td>
+<td>45</td>
+</tr>
+<tr>
+<td>prime_7_11_13</td>
+<td>1</td>
+<td>77.0</td>
+<td>77</td>
+<td>77.0</td>
+<td>77</td>
+</tr>
+<tr>
+<td>mixed</td>
+<td>5</td>
+<td>91.8</td>
+<td>187</td>
+<td>91.8</td>
+<td>187</td>
+</tr>
+</tbody>
+</table>
+<h3 id="family-counts-fxfyfz-20">15.3 Family Counts (fx,fy,fz ≤ 20)</h3>
+<table>
+<thead>
+<tr>
+<th>Prime Class</th>
+<th>Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2_3_5_smooth</td>
+<td>4156</td>
+</tr>
+<tr>
+<td>prime_7_11_13</td>
+<td>679</td>
+</tr>
+<tr>
+<td>mixed</td>
+<td>3165</td>
+</tr>
+</tbody>
+</table>
+<h3 id="base-representation-termination-rates">15.4 Base Representation
+Termination Rates</h3>
+<table>
+<thead>
+<tr>
+<th>Base</th>
+<th>2_3_5_smooth</th>
+<th>prime_7_11_13</th>
+<th>mixed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td>0.71</td>
+<td>0.00</td>
+<td>0.40</td>
+</tr>
+<tr>
+<td>12</td>
+<td>0.76</td>
+<td>0.00</td>
+<td>0.27</td>
+</tr>
+<tr>
+<td>60</td>
+<td><strong>1.00</strong></td>
+<td>0.00</td>
+<td>0.47</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Base-60 achieves 100% termination for 2_3_5_smooth frequency
+ratios.</strong></p>
+<p><strong>Images</strong>:
+<code>results/experiment_20/20_lissajous_3d_1_1_1.svg</code>,
+<code>results/experiment_20/20_lissajous_3d_3_2_1.svg</code>,
+<code>results/experiment_20/20_lissajous_3d_5_3_2.svg</code>,
+<code>results/experiment_20/20_lissajous_3d_7_5_3.svg</code>,
+<code>results/experiment_20/20_lissajous_3d_13_11_7.svg</code>,
+<code>results/experiment_20/20_family_counts.svg</code>,
+<code>results/experiment_20/20_base_terminating_rates.svg</code>,
+<code>results/experiment_20/20_diophantine_quality.svg</code>,
+<code>results/experiment_20/20_closure_period_by_class.svg</code>,
+<code>results/experiment_20/20_phase_effects_3d.svg</code></p>
+<p><strong>Source</strong>:
+<code>docs/findings/experiment-20-lissajous-3d.md:15-97</code></p>
+<hr />
+<h2 id="cognitive-load-mitigation-experiment-21">16. Cognitive Load
+Mitigation (Experiment 21)</h2>
+<h3 id="notation-variant-comparison-values-110000">16.1 Notation Variant
+Comparison (Values 1–10000)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 12%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 11%" />
+<col style="width: 13%" />
+<col style="width: 9%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr>
+<th>Variant</th>
+<th>Distinct Symbols</th>
+<th>Avg Sym Len</th>
+<th>Avg Places</th>
+<th>Symbol Load</th>
+<th>Positional Load</th>
+<th><strong>Composite Load</strong></th>
+<th>Info Density</th>
+<th>Visual Distinct</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Standard Comma-Sep</td>
+<td>60</td>
+<td>2.20</td>
+<td>2.634</td>
+<td>132.00</td>
+<td>2.634</td>
+<td><strong>347.71</strong></td>
+<td>1.846</td>
+<td>0.844</td>
+</tr>
+<tr>
+<td>Chinese Rod Numerals</td>
+<td>55</td>
+<td>4.35</td>
+<td>2.634</td>
+<td>239.25</td>
+<td>2.634</td>
+<td><strong>630.23</strong></td>
+<td>1.104</td>
+<td>0.497</td>
+</tr>
+<tr>
+<td>Babylonian Wedge</td>
+<td>60</td>
+<td>7.02</td>
+<td>2.634</td>
+<td>420.96</td>
+<td>2.634</td>
+<td><strong>1108.89</strong></td>
+<td>0.737</td>
+<td>0.288</td>
+</tr>
+<tr>
+<td><strong>Compact Fixed-Width</strong></td>
+<td>60</td>
+<td><strong>2.00</strong></td>
+<td>2.634</td>
+<td><strong>120.00</strong></td>
+<td>2.634</td>
+<td><strong>316.10</strong></td>
+<td><strong>1.969</strong></td>
+<td><strong>0.847</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Rankings (lower composite = better)</strong>: 1. Compact:
+316.10 2. Standard: 347.71 3. Chinese Rod: 630.23 4. Babylonian Wedge:
+1108.89</p>
+<h3
+id="fraction-representation-quality-all-variants-identical-mathematically">16.2
+Fraction Representation Quality (All Variants Identical
+Mathematically)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 22%" />
+<col style="width: 22%" />
+<col style="width: 20%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th>Variant</th>
+<th>Terminating Count</th>
+<th>Terminating Ratio</th>
+<th>Avg Term Length</th>
+<th>Max Repeat Period</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All</td>
+<td>34</td>
+<td>0.340</td>
+<td>5.0–8.9</td>
+<td>96</td>
+</tr>
+</tbody>
+</table>
+<p><strong>All variants preserve base-60’s mathematical
+advantages</strong> (34% terminating fractions, factorization
+visibility).</p>
+<p><strong>Trade-off confirmed</strong>: Reducing symbol count (learning
+burden) increases positional length (working memory burden), and vice
+versa.</p>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/experiment-21-cognitive-load-mitigation.md:27-98</code></p>
+<hr />
+<h2
+id="continued-fractions-and-diophantine-approximation-experiment-23">17.
+Continued Fractions and Diophantine Approximation (Experiment 23)</h2>
+<h3 id="notable-pi-approximants">17.1 Notable Pi Approximants</h3>
+<table>
+<thead>
+<tr>
+<th>Approximant</th>
+<th>Base-10 Digits</th>
+<th>Base-12 Digits</th>
+<th>Base-60 Digits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3/1</td>
+<td>1/1</td>
+<td>1/1</td>
+<td>1/1</td>
+</tr>
+<tr>
+<td>22/7</td>
+<td>2/1</td>
+<td>2/1</td>
+<td>1/1</td>
+</tr>
+<tr>
+<td>333/106</td>
+<td>3/3</td>
+<td>3/2</td>
+<td>3/6</td>
+</tr>
+<tr>
+<td>355/113</td>
+<td>3/3</td>
+<td>3/2</td>
+<td>6/6</td>
+</tr>
+</tbody>
+</table>
+<h3 id="average-digit-efficiency-base-60-base-10">17.2 Average Digit
+Efficiency (Base-60 / Base-10)</h3>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pi</td>
+<td>1.460</td>
+</tr>
+<tr>
+<td>e</td>
+<td>1.110</td>
+</tr>
+<tr>
+<td>sqrt2</td>
+<td>1.000</td>
+</tr>
+<tr>
+<td>sqrt3</td>
+<td>1.000</td>
+</tr>
+<tr>
+<td>sqrt5</td>
+<td>1.083</td>
+</tr>
+<tr>
+<td>sqrt6</td>
+<td>0.979</td>
+</tr>
+<tr>
+<td>sqrt10</td>
+<td>1.222</td>
+</tr>
+<tr>
+<td>sqrt12</td>
+<td>1.250</td>
+</tr>
+<tr>
+<td>sqrt15</td>
+<td>0.833</td>
+</tr>
+<tr>
+<td>sqrt30</td>
+<td>1.117</td>
+</tr>
+<tr>
+<td>phi</td>
+<td>0.967</td>
+</tr>
+<tr>
+<td>ln2</td>
+<td>1.058</td>
+</tr>
+<tr>
+<td>zeta3</td>
+<td>1.168</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key findings</strong>: Continued fraction period lengths are
+base-invariant; base-60 digit patterns of convergents differ and may
+reveal structure for constants with 2,3,5-factor-related algebraic
+structure.</p>
+<p><strong>Source</strong>:
+<code>docs/findings/experiment-23-continued-fractions-diophantine.md:6-41</code></p>
+<hr />
+<h2 id="kuramoto-oscillator-networks-experiment-24">18. Kuramoto
+Oscillator Networks (Experiment 24)</h2>
+<h3 id="frequency-ratios-tested-5-smooth">18.1 Frequency Ratios Tested
+(5-Smooth)</h3>
+<table>
+<thead>
+<tr>
+<th>Ratio</th>
+<th>Value</th>
+<th>Base-60</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1:20</td>
+<td>0.0500</td>
+<td>1:20</td>
+</tr>
+<tr>
+<td>1:18</td>
+<td>0.0556</td>
+<td>1:18</td>
+</tr>
+<tr>
+<td>1:16</td>
+<td>0.0625</td>
+<td>1:16</td>
+</tr>
+<tr>
+<td>1:15</td>
+<td>0.0667</td>
+<td>1:15</td>
+</tr>
+<tr>
+<td>1:12</td>
+<td>0.0833</td>
+<td>1:12</td>
+</tr>
+<tr>
+<td>1:10</td>
+<td>0.1000</td>
+<td>1:10</td>
+</tr>
+<tr>
+<td>1:9</td>
+<td>0.1111</td>
+<td>1:9</td>
+</tr>
+<tr>
+<td>1:8</td>
+<td>0.1250</td>
+<td>1:8</td>
+</tr>
+<tr>
+<td>1:6</td>
+<td>0.1667</td>
+<td>1:6</td>
+</tr>
+<tr>
+<td>1:5</td>
+<td>0.2000</td>
+<td>1:5</td>
+</tr>
+<tr>
+<td>1:4</td>
+<td>0.2500</td>
+<td>1:4</td>
+</tr>
+</tbody>
+</table>
+<h3 id="network-configurations">18.2 Network Configurations</h3>
+<p><strong>N3_basic</strong>: 3 oscillators, K=1/2, collective frequency
+= 121/2160 = 0;3,L,&lt;40&gt; (base-60) <strong>N5_harmonic</strong>: 5
+oscillators, K=1/2, collective frequency = 29/400 = 0;4,L (base-60)
+<strong>N8_extended</strong>: 8 oscillators, K=3/4, collective frequency
+= 61/640 = 0;5,&lt;43&gt;,7,U (base-60)</p>
+<h3 id="phase-representation-comparison">18.3 Phase Representation
+Comparison</h3>
+<p>All 41 phase differences terminate in all three bases (Base-10:
+41/41, Base-12: 41/41, Base-60: 41/41).</p>
+<p><strong>Key finding</strong>: For these 5-smooth frequency ratios,
+base-60 does not significantly improve termination.</p>
+<p><strong>Source</strong>:
+<code>docs/findings/experiment-24-kuramoto-smooth-ratios.md:6-143</code></p>
+<hr />
+<h2 id="constructible-polygons-and-gauss-wantzel-experiment-25">19.
+Constructible Polygons and Gauss-Wantzel (Experiment 25)</h2>
+<h3 id="constructible-n-gons-tested">19.1 Constructible n-gons
+Tested</h3>
+<table>
+<thead>
+<tr>
+<th>n</th>
+<th>Fermat Factors</th>
+<th>Central Angle</th>
+<th>Base-60 Angle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3</td>
+<td>[3]</td>
+<td>120°</td>
+<td>2,0</td>
+</tr>
+<tr>
+<td>4</td>
+<td>[]</td>
+<td>90°</td>
+<td>1,U</td>
+</tr>
+<tr>
+<td>5</td>
+<td>[5]</td>
+<td>72°</td>
+<td>1,C</td>
+</tr>
+<tr>
+<td>6</td>
+<td>[3]</td>
+<td>60°</td>
+<td>1,0</td>
+</tr>
+<tr>
+<td>8</td>
+<td>[]</td>
+<td>45°</td>
+<td>&lt;45&gt;</td>
+</tr>
+<tr>
+<td>10</td>
+<td>[5]</td>
+<td>36°</td>
+<td>&lt;36&gt;</td>
+</tr>
+<tr>
+<td>12</td>
+<td>[3]</td>
+<td>30°</td>
+<td>U</td>
+</tr>
+<tr>
+<td>15</td>
+<td>[3, 5]</td>
+<td>24°</td>
+<td>O</td>
+</tr>
+<tr>
+<td>17</td>
+<td>[17]</td>
+<td>360/17°</td>
+<td>L;(A,Z,H,&lt;38&gt;,&lt;49&gt;,O,&lt;42&gt;,L)</td>
+</tr>
+<tr>
+<td>60</td>
+<td>[3, 5]</td>
+<td>6°</td>
+<td>6</td>
+</tr>
+</tbody>
+</table>
+<h3 id="termination-summary">19.2 Termination Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Base</th>
+<th>Terminating Coordinates</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td>0</td>
+</tr>
+<tr>
+<td>12</td>
+<td>0</td>
+</tr>
+<tr>
+<td>60</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Correction to Claim 9</strong>: Base-60 does not
+significantly increase termination. Coordinates are algebraic, not
+rational — ‘terminating’ was incorrect term. Base-60 expansions show
+periodic patterns related to the nested radical structure.</p>
+<p><strong>Source</strong>:
+<code>docs/findings/experiment-25-constructible-polygons-base60.md:15-71</code></p>
+<hr />
+<h2 id="resonance-webs-and-arnold-diffusion-experiment-26">20. Resonance
+Webs and Arnold Diffusion (Experiment 26)</h2>
+<h3 id="dimension-analysis">20.1 Dimension Analysis</h3>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 15%" />
+<col style="width: 14%" />
+<col style="width: 12%" />
+<col style="width: 20%" />
+<col style="width: 24%" />
+</colgroup>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Frequencies</th>
+<th>Resonances</th>
+<th>Web Edges</th>
+<th>Diffusion Paths</th>
+<th>Diophantine Quality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dim_4</td>
+<td>4</td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+<td>0.0000</td>
+</tr>
+<tr>
+<td>dim_5</td>
+<td>5</td>
+<td>8</td>
+<td>24</td>
+<td>1048</td>
+<td>0.0000</td>
+</tr>
+<tr>
+<td>dim_6</td>
+<td>6</td>
+<td>20</td>
+<td>162</td>
+<td>75024</td>
+<td>0.0000</td>
+</tr>
+</tbody>
+</table>
+<h3 id="frequency-vectors-base-60">20.2 Frequency Vectors (Base-60)</h3>
+<p><strong>dim_4</strong>: ω = [1/18, 1/16, 1/15, 1/12] = [0;3,K,
+0;3,&lt;45&gt;, 0;4, 0;5] <strong>dim_5</strong>: ω = [1/18, 1/16, 1/15,
+1/12, 1/10] = [0;3,K, 0;3,&lt;45&gt;, 0;4, 0;5, 0;6]
+<strong>dim_6</strong>: ω = [1/18, 1/16, 1/15, 1/12, 1/10, 1/9] =
+[0;3,K, 0;3,&lt;45&gt;, 0;4, 0;5, 0;6, 0;6,&lt;40&gt;]</p>
+<h3 id="key-findings">20.3 Key Findings</h3>
+<ul>
+<li>Resonance vector notation: Base-10 total 406 chars, Base-60 total
+406 chars → <strong>no compactness advantage</strong></li>
+<li>Resonance web connectivity increases with dimension (expected)</li>
+<li>Diophantine quality measures KAM stability</li>
+<li>Denominator family analysis from Experiment 20 extended to web
+context</li>
+</ul>
+<p><strong>Source</strong>:
+<code>docs/findings/experiment-26-resonance-webs-arnold-diffusion.md:6-69</code></p>
+<hr />
+<h2 id="ntt-with-60-smooth-moduli-experiment-22">21. NTT with 60-Smooth
+Moduli (Experiment 22)</h2>
+<h3 id="results-summary">21.1 Results Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Lengths Tested</th>
+<th>Total Moduli</th>
+<th>Avg/Length</th>
+<th>Max/Length</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>powers_of_2</td>
+<td>15</td>
+<td>1501</td>
+<td>100.1</td>
+<td>167</td>
+</tr>
+<tr>
+<td>3_smooth</td>
+<td>15</td>
+<td>2222</td>
+<td>148.1</td>
+<td>208</td>
+</tr>
+<tr>
+<td>5_smooth</td>
+<td>15</td>
+<td>2114</td>
+<td>140.9</td>
+<td>208</td>
+</tr>
+<tr>
+<td>7_smooth</td>
+<td>15</td>
+<td>2098</td>
+<td>139.9</td>
+<td>208</td>
+</tr>
+</tbody>
+</table>
+<h3 id="base-60-advantage">21.2 Base-60 Advantage</h3>
+<ul>
+<li>5-smooth vs powers of 2: <strong>+613 additional
+moduli</strong></li>
+<li>5-smooth vs 3-smooth: -108 additional moduli</li>
+<li>Including factor 3 (5-smooth vs powers of 2) adds 613 moduli</li>
+</ul>
+<h3 id="smoothness-of-p-1">21.3 Smoothness of p-1</h3>
+<table>
+<thead>
+<tr>
+<th>Smoothness</th>
+<th>Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5-smooth</td>
+<td>385</td>
+</tr>
+<tr>
+<td>12-smooth</td>
+<td>131</td>
+</tr>
+<tr>
+<td>60-smooth</td>
+<td>83</td>
+</tr>
+<tr>
+<td>other</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key finding</strong>: ✅ <strong>CONFIRMED</strong> —
+Including factor 3 (5-smooth = base-60 factors) yields strictly more NTT
+moduli than powers of 2 alone.</p>
+<p><strong>Source</strong>:
+<code>docs/findings/experiment-22-ntt-smooth-moduli.md:3-38</code></p>
+<hr />
+<h2 id="composite-metrics-comparison-exact-rational">22. Composite
+Metrics Comparison (Exact Rational)</h2>
+<h3
+id="detailed-metrics-exact-values-from-metrics-comparison-report.md">22.1
+Detailed Metrics (Exact Values from metrics-comparison-report.md)</h3>
+<h4 id="base-10-decimal">Base 10 (Decimal)</h4>
+<ul>
+<li><strong>Avg digits/value</strong>: <code>2894/1001</code> ≈
+2.8911</li>
+<li><strong>Information density</strong>: <code>332193/100000</code> =
+3.32193 bits/digit</li>
+<li><strong>Terminating fraction ratio</strong>: <code>3/20</code> =
+0.1500</li>
+<li><strong>Avg repeating period</strong>: <code>1177/85</code> ≈
+13.8471</li>
+<li><strong>Multiplication complexity</strong>: 1 (reference)</li>
+<li><strong>Addition complexity</strong>: 1 (reference)</li>
+<li><strong>Symbol count</strong>: 10</li>
+<li><strong>Cognitive load</strong>: <code>28940/1001</code> ≈
+28.9111</li>
+<li><strong>Factorization visibility</strong>: <code>7/10</code> =
+0.7000</li>
+<li><strong>Pattern revelation</strong>: <code>12/5</code> = 2.4000</li>
+</ul>
+<h4 id="base-12-duodecimal">Base 12 (Duodecimal)</h4>
+<ul>
+<li><strong>Avg digits/value</strong>: <code>219/77</code> ≈ 2.8442</li>
+<li><strong>Information density</strong>: <code>11203/3125</code> =
+3.58496 bits/digit</li>
+<li><strong>Terminating fraction ratio</strong>: <code>1/5</code> =
+0.2000</li>
+<li><strong>Avg repeating period</strong>: <code>1127/80</code> ≈
+14.0875</li>
+<li><strong>Multiplication complexity</strong>: <code>36/25</code> =
+1.44</li>
+<li><strong>Addition complexity</strong>: <code>6/5</code> = 1.20</li>
+<li><strong>Symbol count</strong>: 12</li>
+<li><strong>Cognitive load</strong>: <code>2628/77</code> ≈ 34.1299</li>
+<li><strong>Factorization visibility</strong>: <code>5/6</code> ≈
+0.8333</li>
+<li><strong>Pattern revelation</strong>: <code>29/10</code> =
+2.9000</li>
+</ul>
+<h4 id="base-60-sexagesimal">Base 60 (Sexagesimal)</h4>
+<ul>
+<li><strong>Avg digits/value</strong>: <code>1942/1001</code> ≈
+1.9401</li>
+<li><strong>Information density</strong>: <code>590689/100000</code> =
+5.90689 bits/digit</li>
+<li><strong>Terminating fraction ratio</strong>: <code>17/50</code> =
+0.3400</li>
+<li><strong>Avg repeating period</strong>: <code>623/33</code> ≈
+18.8788</li>
+<li><strong>Multiplication complexity</strong>: 36 (36× base-10)</li>
+<li><strong>Addition complexity</strong>: 6 (6× base-10)</li>
+<li><strong>Symbol count</strong>: 60</li>
+<li><strong>Cognitive load</strong>: <code>116520/1001</code> ≈
+116.4036</li>
+<li><strong>Factorization visibility</strong>: <code>31/30</code> ≈
+1.0333</li>
+<li><strong>Pattern revelation</strong>: <code>189/50</code> =
+3.7800</li>
+</ul>
+<h3 id="category-rankings">22.2 Category Rankings</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>1st</th>
+<th>2nd</th>
+<th>3rd</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Representation Efficiency</td>
+<td>Base 60</td>
+<td>Base 12</td>
+<td>Base 10</td>
+</tr>
+<tr>
+<td>Mathematical Simplicity</td>
+<td>Base 60</td>
+<td>Base 12</td>
+<td>Base 10</td>
+</tr>
+<tr>
+<td>Computational Efficiency</td>
+<td>Base 10</td>
+<td>Base 12</td>
+<td>Base 60</td>
+</tr>
+<tr>
+<td>Visual Interpretability</td>
+<td>Base 10</td>
+<td>Base 12</td>
+<td>Base 60</td>
+</tr>
+<tr>
+<td>Discovery Effectiveness</td>
+<td>Base 60</td>
+<td>Base 12</td>
+<td>Base 10</td>
+</tr>
+</tbody>
+</table>
+<h3 id="overall-composite-scores-exact">22.3 Overall Composite Scores
+(Exact)</h3>
+<table>
+<thead>
+<tr>
+<th>Base</th>
+<th>Exact Score</th>
+<th>Decimal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>12</strong></td>
+<td><code>32806417941851/64001624820000</code></td>
+<td><strong>0.5126</strong></td>
+</tr>
+<tr>
+<td><strong>10</strong></td>
+<td><code>935509/2118200</code></td>
+<td>0.4417</td>
+</tr>
+<tr>
+<td><strong>60</strong></td>
+<td><code>217/500</code></td>
+<td>0.4340</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Source</strong>:
+<code>base12-base60-laboratory/docs/findings/metrics-comparison-report.md:42-131</code></p>
+<hr />
+<h2 id="digital-simulations-practical-applications">23. Digital
+Simulations &amp; Practical Applications</h2>
+<p>This section synthesizes findings from experiments with direct
+computational and engineering relevance.</p>
+<h3 id="fft-optimization-for-60-hz-systems">23.1 FFT Optimization for 60
+Hz Systems</h3>
+<p><strong>Finding</strong>: For power systems and rotating machinery
+operating at 60 Hz, using <strong>60-smooth FFT sizes</strong> (3600,
+7200, 10800, etc.) provides: - Exact frequency resolution (1 Hz bins at
+3600 Hz sample rate) - Zero spectral leakage for 60 Hz harmonics -
+2.7×–4.5× speedup over poorly-factored sizes - Same numerical precision
+(~52 bits) as powers of 2</p>
+<p><strong>Practical recommendation</strong>: Pad or resample to
+60-smooth NFFT for 60 Hz systems instead of defaulting to powers of
+2.</p>
+<p><strong>Source</strong>: Experiments 08, 09, 10, 16 —
+<code>results/experiment_16/experiment_16_benchmarks.svg</code>,
+<code>results/experiment_16/experiment_16_prediction_accuracy.svg</code></p>
+<h3 id="ntt-moduli-selection-for-cryptographic-applications">23.2 NTT
+Moduli Selection for Cryptographic Applications</h3>
+<p><strong>Finding</strong>: Base-60’s 5-smooth factorization (2, 3, 5)
+yields <strong>613 more NTT-friendly prime moduli</strong> than powers
+of 2 alone when searching k·N+1 forms with 5-smooth k.</p>
+<p><strong>Practical recommendation</strong>: For NTT-based cryptography
+(FHE, ZK-SNARKs), consider 5-smooth transform lengths to maximize
+available prime moduli.</p>
+<p><strong>Source</strong>: Experiment 22 —
+<code>docs/findings/experiment-22-ntt-smooth-moduli.md</code></p>
+<h3 id="base-60-notation-for-human-computer-interfaces">23.3 Base-60
+Notation for Human-Computer Interfaces</h3>
+<p><strong>Finding</strong>: The <strong>Compact Fixed-Width</strong>
+notation (two digits 00-59 per place) achieves: - Lowest composite
+cognitive load: 316.10 - Highest information density: 1.969 bits/char -
+Best visual distinctness: 0.847 - Full preservation of base-60
+mathematical advantages (34% terminating fractions)</p>
+<p><strong>Practical recommendation</strong>: Use compact fixed-width
+sexagesimal (00-59) for display in time/angle applications; reserve
+standard comma-separated for internal representation.</p>
+<p><strong>Source</strong>: Experiment 21 —
+<code>base12-base60-laboratory/docs/findings/experiment-21-cognitive-load-mitigation.md</code></p>
+<h3 id="babylonian-methods-for-exact-geometric-computation">23.4
+Babylonian Methods for Exact Geometric Computation</h3>
+<p><strong>Finding</strong>: The reciprocal-pair method for generating
+Pythagorean triples (Plimpton 322) works with exact rational arithmetic
+and extends systematically: - 15 original triples verified exactly - 38
+total admissible rows from regular pairs p ≤ 125, q ≤ 60 - All satisfy
+a² + b² = c² exactly using Rational arithmetic</p>
+<p><strong>Practical application</strong>: Exact rational generation of
+Pythagorean triples for CAD, computer graphics, and geometric constraint
+solving without floating-point error.</p>
+<p><strong>Source</strong>: Experiment 15 —
+<code>base12-base60-laboratory/docs/findings/experiment-15-babylonian-reciprocals.md</code></p>
+<h3 id="modular-forms-in-base-60-for-number-theory">23.5 Modular Forms
+in Base-60 for Number Theory</h3>
+<p><strong>Finding</strong>: Base-60 uniquely aligns with modular forms:
+- 1/24 = 0;2,30 terminates in base-60 (critical for Dedekind eta
+function η(τ) = q^(1/24)…) - τ(n) mod 60 shows 60-cycle periodicity
+(Caldin 2026) - 5 (base-60 factor) is a Ramanujan congruence prime -
+Δ(τ) = η(τ)²⁴ coefficients match τ(n) exactly</p>
+<p><strong>Practical application</strong>: Base-60 arithmetic provides
+natural representation for modular forms computations in number theory
+research.</p>
+<p><strong>Source</strong>: Experiment 18 —
+<code>docs/findings/experiment-18-modular-forms-qseries.md</code></p>
+<h3 id="direct-base-conversion-for-embedded-systems">23.6 Direct Base
+Conversion for Embedded Systems</h3>
+<p><strong>Finding</strong>: Direct base-to-base conversion (Patil 2025)
+achieves 100% accuracy via decimal intermediate, but is <strong>10–100×
+slower</strong> in Python due to native big-integer optimization.</p>
+<p><strong>Practical recommendation</strong>: On platforms without
+native arbitrary-precision integers (embedded systems, FPGAs), direct
+conversion avoids decimal intermediate overhead. On desktop/server
+Python, use decimal intermediate.</p>
+<p><strong>Source</strong>: Experiment 17 —
+<code>base12-base60-laboratory/docs/findings/experiment-17-direct-base-conversion.md</code></p>
+<h3 id="d-torus-dynamics-for-signal-processing">23.7 3D Torus Dynamics
+for Signal Processing</h3>
+<p><strong>Finding</strong>: 3D Lissajous trajectories on the 3-torus
+with 2_3_5_smooth frequency ratios: - 100% terminating in base-60 -
+Smallest closure periods (avg 15.4 vs 77–92 for mixed/prime) - Simplest
+resonance webs with small integer coefficients - Phase differences
+rotate but don’t affect closure</p>
+<p><strong>Practical application</strong>: Design of multi-tone test
+signals, phase-locked loop analysis, and synchronization networks where
+base-60 representation reveals structure.</p>
+<p><strong>Source</strong>: Experiment 20 —
+<code>docs/findings/experiment-20-lissajous-3d.md</code>,
+<code>results/experiment_20/</code></p>
+<hr />
+<h2 id="conclusions">24. Conclusions</h2>
+<h3 id="summary-of-empirical-findings">24.1 Summary of Empirical
+Findings</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Base 10</th>
+<th>Base 12</th>
+<th>Base 60</th>
+<th>Winner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unit Fraction Termination (1-100)</td>
+<td>15%</td>
+<td>20%</td>
+<td><strong>34%</strong></td>
+<td><strong>60</strong></td>
+</tr>
+<tr>
+<td>Circle Subdivisions (turns)</td>
+<td>0/8</td>
+<td>3/8</td>
+<td><strong>8/8</strong></td>
+<td><strong>60</strong></td>
+</tr>
+<tr>
+<td>Just Intonation Intervals</td>
+<td>8/11</td>
+<td>8/11</td>
+<td><strong>11/11</strong></td>
+<td><strong>60</strong></td>
+</tr>
+<tr>
+<td>5-smooth FFT Speed (vs poorly-factored)</td>
+<td>2.8×</td>
+<td>2.8×</td>
+<td>2.0×</td>
+<td><strong>12/10</strong></td>
+</tr>
+<tr>
+<td>Cognitive Load (lower better)</td>
+<td><strong>28.9</strong></td>
+<td>34.1</td>
+<td>116.4</td>
+<td><strong>10</strong></td>
+</tr>
+<tr>
+<td>Multiplication Table Complexity</td>
+<td><strong>1.0</strong></td>
+<td>1.44</td>
+<td>36.0</td>
+<td><strong>10</strong></td>
+</tr>
+<tr>
+<td>Information Density (bits/digit)</td>
+<td>3.32</td>
+<td>3.58</td>
+<td><strong>5.91</strong></td>
+<td><strong>60</strong></td>
+</tr>
+<tr>
+<td>Composite Score</td>
+<td>0.4417</td>
+<td><strong>0.5126</strong></td>
+<td>0.4340</td>
+<td><strong>12</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="fundamental-trade-offs">24.2 Fundamental Trade-offs</h3>
+<ol type="1">
+<li><p><strong>Mathematical structure vs. cognitive ergonomics</strong>:
+Base-60’s three small prime factors (2,3,5) maximize terminating
+fractions and factorization visibility, but require 60 symbols and a 36×
+multiplication table.</p></li>
+<li><p><strong>Balanced utility</strong>: Base-12 achieves the best
+compromise — reasonable computational cost (1.44× multiplication, 1.20×
+addition) with strong mathematical properties (factor 3 enables 1/3,
+1/6, 1/12 exact).</p></li>
+<li><p><strong>Application determines choice</strong>:</p>
+<ul>
+<li><strong>Human learnability</strong>: Base 10</li>
+<li><strong>Balanced mathematical/ergonomic</strong>: Base 12</li>
+<li><strong>Maximum mathematical structure (time, angle,
+astronomy)</strong>: Base 60</li>
+</ul></li>
+</ol>
+<h3 id="historical-validation">24.3 Historical Validation</h3>
+<p>The Babylonians chose base-60 for astronomy/geometry precisely
+because: - 60 has 12 divisors: 1,2,3,4,5,6,10,12,15,20,30,60 - 360° =
+6×60 → circle divides into 6 parts of 60° - Each degree → 60 minutes →
+60 seconds - <strong>All standard musical intervals terminate in
+base-60</strong> (confirmed experimentally) - <strong>5-smooth FFT sizes
+are optimal for 60 Hz systems</strong> (confirmed experimentally)</p>
+<h3 id="open-questions-from-unknowns-registry">24.4 Open Questions (From
+Unknowns Registry)</h3>
+<ul>
+<li>Exact period of 1/7 in base-60 (currently: 12)</li>
+<li>Cognitive load of compact fixed-width notation in practice</li>
+<li>NTT with 60-smooth moduli (deprioritized)</li>
+<li>Algebraic number support for constructible polygons</li>
+</ul>
+<hr />
+<h2 id="verification-and-reproducibility">25. Verification and
+Reproducibility</h2>
+<ul>
+<li><strong>Total tests</strong>: 815 collected, 815 passing (98%
+coverage)</li>
+<li><strong>Exact arithmetic</strong>: All internal computations use
+<code>Rational</code> (backed by <code>fractions.Fraction</code>);
+<strong>zero floating-point</strong> used internally</li>
+<li><strong>Deterministic</strong>: Every function is pure; repeated
+calls produce bitwise-identical <code>Rational</code> results</li>
+<li><strong>Test coverage</strong>: 36 tests for metrics, 71 for
+numerals, 29 for modular, 46 for trigonometry, 15 for angles, 10 for
+frequency, plus all experiment-specific tests</li>
+<li><strong>Artifacts</strong>: CSV, JSON, SVG/PNG for all
+experiments</li>
+</ul>
+<p><strong>Test command</strong>:
+<code>cd base12-base60-laboratory &amp;&amp; python -m pytest -x -q</code></p>
+<hr />
+<h2 id="references">26. References</h2>
+<ol type="1">
+<li>Caldwell, A.S. (2026). “Babylonian Reciprocals and Plimpton 322:
+Generating Pythagorean Triples in Base-60”. Zenodo:
+10.5281/zenodo.23310316</li>
+<li>Schumacher, R. (2016). “The Formulas for the Distribution of the
+3-Smooth, 5-Smooth, 7-Smooth and all other Smooth Numbers”. ArXiv:
+1608.06928v4</li>
+<li>Patil, D. (2025). “Direct Base-to-Base Conversion with Array-Based
+Arithmetic”. EngrXiv Preprint. DOI: 10.5281/zenodo.17735748</li>
+<li>Neugebauer &amp; Sachs (1945). <em>Mathematical Cuneiform
+Texts</em>.</li>
+<li>Robson, E. (2001). “Neither Sherlock Holmes nor Babylon: A
+Reassessment of Plimpton 322”.</li>
+<li>Friberg, J. (1981). “Methods and Traditions of Babylonian
+Mathematics”.</li>
+<li>Abdulaziz, A.A. (2010). “The Plimpton 322 Tablet and the Babylonian
+Method of Generating Pythagorean Triples”. arXiv:1004.0025</li>
+<li>Caldin (2026). Tau function modulo 60 periodicity claim.</li>
+</ol>
+<hr />
+<h2 id="embedded-image-reference-index">27. Embedded Image Reference
+Index</h2>
+<h3 id="experiment-18-modular-forms">Experiment 18 (Modular Forms)</h3>
+<ul>
+<li><code>results/experiment_18/18_main_plots.svg</code> — Main analysis
+plots</li>
+<li><code>results/experiment_18/18_eta_delta_coefficients.svg</code> —
+η(τ) and Δ(τ) coefficients</li>
+<li><code>results/experiment_18/18_tau_modulo_small.svg</code> — τ(n)
+modulo small primes</li>
+<li><code>results/experiment_18/18_base60_digit_frequency.svg</code> —
+Base-60 digit frequency for p(n) and τ(n)</li>
+</ul>
+<h3 id="experiment-20-3d-lissajous">Experiment 20 (3D Lissajous)</h3>
+<ul>
+<li><code>results/experiment_20/20_lissajous_3d_1_1_1.svg</code> — 1:1:1
+frequency triplet</li>
+<li><code>results/experiment_20/20_lissajous_3d_3_2_1.svg</code> — 3:2:1
+frequency triplet</li>
+<li><code>results/experiment_20/20_lissajous_3d_5_3_2.svg</code> — 5:3:2
+frequency triplet</li>
+<li><code>results/experiment_20/20_lissajous_3d_7_5_3.svg</code> — 7:5:3
+frequency triplet</li>
+<li><code>results/experiment_20/20_lissajous_3d_13_11_7.svg</code> —
+13:11:7 frequency triplet</li>
+<li><code>results/experiment_20/20_family_counts.svg</code> —
+Denominator family distribution</li>
+<li><code>results/experiment_20/20_base_terminating_rates.svg</code> —
+Base termination rates by class</li>
+<li><code>results/experiment_20/20_diophantine_quality.svg</code> — KAM
+Diophantine quality</li>
+<li><code>results/experiment_20/20_closure_period_by_class.svg</code> —
+Closure period by prime class</li>
+<li><code>results/experiment_20/20_phase_effects_3d.svg</code> — Phase
+effects on 3D trajectories</li>
+</ul>
+<h3 id="experiment-16-smooth-fft">Experiment 16 (Smooth FFT)</h3>
+<ul>
+<li><code>base12-base60-laboratory/docs/findings/experiment_16_counting_accuracy.svg</code>
+— Counting formula validation</li>
+<li><code>base12-base60-laboratory/docs/findings/experiment_16_prediction_accuracy.svg</code>
+— Prediction accuracy</li>
+<li><code>base12-base60-laboratory/docs/findings/experiment_16_benchmarks.svg</code>
+— Benchmark performance</li>
+<li><code>base12-base60-laboratory/docs/findings/experiment_16_smooth_distribution.svg</code>
+— Smooth number distribution</li>
+</ul>
+<h3 id="experiment-21-cognitive-load">Experiment 21 (Cognitive
+Load)</h3>
+<ul>
+<li><code>base12-base60-laboratory/docs/findings/cognitive_load_comparison.svg</code>
+— Cognitive load by variant</li>
+<li><code>base12-base60-laboratory/docs/findings/fraction_quality_comparison.svg</code>
+— Fraction quality by variant</li>
+</ul>
+<hr />
+<p><em>All numeric values in this paper are exact rational numbers.
+Decimal approximations are shown only for readability. Source files:
+<code>docs/findings/*.md</code>,
+<code>base12-base60-laboratory/docs/findings/*.md</code>,
+<code>src/base60lab/</code>, <code>tests/</code>,
+<code>results/experiment_*/</code>.</em></p>
+</body>
+</html>

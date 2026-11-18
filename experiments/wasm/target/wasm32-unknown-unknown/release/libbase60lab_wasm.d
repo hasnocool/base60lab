@@ -1,0 +1,1 @@
+/home/hyperion/Projects/Base60Research/base12-base60-laboratory/experiments/wasm/target/wasm32-unknown-unknown/release/libbase60lab_wasm.rlib: /home/hyperion/Projects/Base60Research/base12-base60-laboratory/experiments/wasm/src/lib.rs

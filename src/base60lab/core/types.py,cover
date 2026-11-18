@@ -1,0 +1,126 @@
+> """Shared type definitions for base numbers, expressions, notations, and functions.
+  
+> Every base engine produces values of these types so that domain modules and
+> experiments can work uniformly across base-10, base-12 and base-60 without
+> re-implementing per-base logic.
+> """
+  
+> from __future__ import annotations
+  
+> from dataclasses import dataclass, field
+> from enum import Enum
+> from typing import Any, Callable, Generic, TypeVar
+  
+> from .rational import Rational
+  
+> T = TypeVar("T")
+  
+  
+> class NotationSystem(Enum):
+>     """The numeral system used to *display* a value."""
+  
+>     DECIMAL = 10      # base 10
+>     DUODECIMAL = 12   # base 12
+>     SEXAGESIMAL = 60  # base 60
+  
+  
+> @dataclass(frozen=True)
+> class BaseNumber:
+>     """A numerical value together with the base in which it is expressed.
+  
+>     The internal :attr:`value` is always an exact :class:`Rational`; the base
+>     is purely a presentation choice.  Two :class:`BaseNumber` instances with
+>     different bases but equal values are mathematically identical.
+>     """
+  
+>     value: Rational
+>     base: int  # 10, 12, or 60
+  
+>     def __post_init__(self) -> None:
+>         if self.base not in (10, 12, 60):
+>             raise ValueError(f"unsupported base {self.base}; must be 10, 12, or 60")
+  
+>     def is_terminating(self) -> bool:
+>         """True if this value has a terminating representation in its own base."""
+>         return self.value.is_terminating_in_base(self.base)
+  
+>     def repeating_period(self) -> int | None:
+>         """Length of the repeating period in its own base, or None if terminating."""
+!         return self.value.repeating_period_in_base(self.base)
+  
+>     def with_base(self, new_base: int) -> BaseNumber:
+>         """Return the same mathematical value expressed in a different base."""
+>         return BaseNumber(self.value, new_base)
+  
+>     def __eq__(self, other: object) -> bool:
+>         if not isinstance(other, BaseNumber):
+!             return NotImplemented
+>         return self.value == other.value  # base-independent equality
+  
+>     def __hash__(self) -> int:
+!         return hash(self.value)
+  
+  
+> @dataclass(frozen=True)
+> class Expression(Generic[T]):
+>     """A symbolic expression over base numbers.
+  
+>     ``operator`` names the operation (e.g. ``"add"``, ``"mul"``, ``"sin"``,
+>     ``"convert_base"``).  ``operands`` are the child expressions or literals.
+>     ``value`` is the cached exact result when the expression has been evaluated.
+>     """
+  
+>     operator: str
+>     operands: tuple[Any, ...] = field(default_factory=tuple)
+>     value: T | None = None
+  
+>     def evaluated(self) -> bool:
+>         return self.value is not None
+  
+  
+> @dataclass(frozen=True)
+> class Notation:
+>     """A rendered string representation of a value in a specific base.
+  
+>     ``digits`` is the sequence of digit symbols (e.g. ``["0", "1", ..., "9",
+>     "A", "B"]`` for base 12).  ``fractional_point`` is the symbol separating
+>     integer and fractional parts (``"."`` for decimal, ``";"`` for
+>     sexagesimal in some conventions).  ``repeating`` marks the start index of
+>     the repeating period, or None if the representation terminates.
+>     """
+  
+>     base: int
+>     digits: tuple[str, ...]
+>     fractional_point: str
+>     text: str
+>     repeating: int | None = None
+  
+>     def is_terminating(self) -> bool:
+>         return self.repeating is None
+  
+  
+> @dataclass(frozen=True)
+> class Function(Generic[T]):
+>     """A mathematical function definition.
+  
+>     ``name`` is the function identifier.  ``arity`` is the number of arguments.
+>     ``evaluate`` is an optional callable that computes the exact result from
+>     argument values.  ``domain`` describes the valid input domain (base,
+>     terminating-only, etc.).
+>     """
+  
+>     name: str
+>     arity: int
+>     evaluate: Callable[..., T] | None = None
+>     domain: dict[str, Any] | None = field(default_factory=dict)
+  
+>     def call(self, *args: T) -> T:
+>         if self.evaluate is None:
+>             raise NotImplementedError(f"function {self.name!r} has no evaluator")
+>         return self.evaluate(*args)
+  
+>     def __call__(self, *args: T) -> T:
+>         return self.call(*args)
+  
+  
+> __all__ = ["NotationSystem", "BaseNumber", "Expression", "Notation", "Function"]

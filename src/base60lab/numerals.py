@@ -1,0 +1,531 @@
+"""Base conversion and arithmetic utilities across bases 10, 12, 60.
+
+All internal calculations use exact rational arithmetic (Rational from core.rational).
+No floating-point arithmetic is used internally.
+"""
+
+from __future__ import annotations
+
+from math import gcd
+from typing import Union
+
+from .core.rational import Rational
+
+
+# -- Digit symbol tables -------------------------------------------------------
+
+# Base 10: 0-9
+DIGITS_10 = tuple(str(d) for d in range(10))
+DIGIT_VALUE_10 = {d: i for i, d in enumerate(DIGITS_10)}
+
+# Base 12: 0-9, A, B (values 10, 11)
+DIGITS_12 = tuple(str(d) for d in range(10)) + ("A", "B")
+DIGIT_VALUE_12 = {d: i for i, d in enumerate(DIGITS_12)}
+
+# Base 60: 0-9, A-Z (10-35), <36> ... <59>
+DIGITS_60 = tuple(str(d) for d in range(10)) + tuple(chr(ord("A") + i) for i in range(26))
+# For values 36-59, use angle bracket notation: <36>, <37>, ..., <59>
+DIGIT_VALUE_60 = {d: i for i, d in enumerate(DIGITS_60)}
+for v in range(36, 60):
+    DIGIT_VALUE_60[f"<{v}>"] = v
+
+
+# -- Public digit symbol access ------------------------------------------------
+
+def digits_for_base(base: int) -> tuple[str, ...]:
+    """Return the digit symbols for the given base (10, 12, or 60)."""
+    if base == 10:
+        return DIGITS_10
+    if base == 12:
+        return DIGITS_12
+    if base == 60:
+        return DIGITS_60
+    raise ValueError(f"unsupported base: {base}. Supported bases: 10, 12, 60")
+
+
+def digit_value_for_base(base: int) -> dict[str, int]:
+    """Return the mapping from digit symbol to value for the given base."""
+    if base == 10:
+        return DIGIT_VALUE_10
+    if base == 12:
+        return DIGIT_VALUE_12
+    if base == 60:
+        return DIGIT_VALUE_60
+    raise ValueError(f"unsupported base: {base}. Supported bases: 10, 12, 60")
+
+
+def base_digit_symbol(value: int, base: int) -> str:
+    """Return the digit symbol for a single digit value in the given base."""
+    if base == 10:
+        if not 0 <= value <= 9:
+            raise ValueError(f"base 10 digit must be 0-9, got {value}")
+        return str(value)
+    if base == 12:
+        if not 0 <= value <= 11:
+            raise ValueError(f"base 12 digit must be 0-11, got {value}")
+        return DIGITS_12[value]
+    if base == 60:
+        if not 0 <= value <= 59:
+            raise ValueError(f"base 60 digit must be 0-59, got {value}")
+        if value < 36:
+            return DIGITS_60[value]
+        return f"<{value}>"
+    raise ValueError(f"unsupported base: {base}. Supported bases: 10, 12, 60")
+
+
+# -- Integer to base string conversion ----------------------------------------
+
+def int_to_base(n: int, base: int) -> str:
+    """Convert a non-negative integer to its string representation in the given base.
+
+    Args:
+        n: Non-negative integer to convert
+        base: Target base (10, 12, or 60)
+
+    Returns:
+        String representation in the given base.
+        For base 60, uses comma-separated sexagesimal place values.
+
+    Raises:
+        ValueError: If base is not supported or n is negative
+    """
+    if base not in (10, 12, 60):
+        raise ValueError(f"unsupported base: {base}. Supported bases: 10, 12, 60")
+    if n < 0:
+        raise ValueError(f"negative integers not supported: {n}")
+    if n == 0:
+        return "0"
+
+    digits = []
+    while n > 0:
+        n, rem = divmod(n, base)
+        digits.append(base_digit_symbol(rem, base))
+
+    if base == 60:
+        return ",".join(reversed(digits))
+    return "".join(reversed(digits))
+
+def int_from_base(s: str, base: int) -> int:
+    """Convert a string representation in the given base to an integer.
+
+    Args:
+        s: String representation in the given base. For base 60, comma-separated
+           sexagesimal notation is also accepted (e.g., "1,0" for 60).
+           Each comma-separated group is a single sexagesimal place value (0-59).
+        base: Source base (10, 12, or 60)
+
+    Returns:
+        Integer value
+
+    Raises:
+        ValueError: If base is not supported, string is empty, or contains invalid digits
+    """
+    if base not in (10, 12, 60):
+        raise ValueError(f"unsupported base: {base}. Supported bases: 10, 12, 60")
+    if not s:
+        raise ValueError("empty string")
+    if s == "0":
+        return 0
+
+    digit_values = digit_value_for_base(base)
+    result = 0
+
+    if base == 60 and "," in s:
+        # Comma-separated sexagesimal: each group is a place value
+        groups = s.split(",")
+        for group in groups:
+            if not group:
+                continue
+            # Parse each group as a single sexagesimal digit
+            if group.startswith("<"):
+                if not group.endswith(">"):
+                    raise ValueError(f"unclosed angle bracket in base-60 string: {s}")
+            if group not in digit_values:
+                raise ValueError(f"invalid digit {group!r} for base {base}")
+            result = result * base + digit_values[group]
+    else:
+        # Standard positional notation
+        i = 0
+        while i < len(s):
+            # Check for angle bracket notation (base 60 values 36-59)
+            if base == 60 and s[i] == "<":
+                j = s.find(">", i)
+                if j == -1:
+                    raise ValueError(f"unclosed angle bracket in base-60 string: {s}")
+                token = s[i:j+1]
+                i = j + 1
+            else:
+                token = s[i]
+                i += 1
+
+            if token not in digit_values:
+                raise ValueError(f"invalid digit {token!r} for base {base}")
+            result = result * base + digit_values[token]
+
+    return result
+
+# -- Rational to base string conversion ---------------------------------------
+
+def rational_to_base(value: Rational, base: int, max_digits: int = 1000) -> str:
+    """Convert an exact Rational to its string representation in the given base.
+
+    Args:
+        value: Rational number to convert
+        base: Target base (10, 12, or 60)
+        max_digits: Maximum fractional digits to compute (safety limit)
+
+    Returns:
+        String representation in the given base, using:
+        - '.' as fractional point for bases 10 and 12
+        - ';' as fractional point for base 60 (sexagesimal convention)
+        - Comma-separated digits for base 60 fractional part
+        - Parentheses for repeating parts: e.g., "0.3(3)" for 1/3 in base 10
+
+    Raises:
+        ValueError: If base is not supported
+    """
+    if base not in (10, 12, 60):
+        raise ValueError(f"unsupported base: {base}. Supported bases: 10, 12, 60")
+
+    num = value.numerator
+    den = value.denominator
+    sign = "-" if num < 0 else ""
+    num = abs(num)
+
+    integer_part = num // den
+    remainder = num % den
+
+    # Integer part
+    int_str = int_to_base(integer_part, base) if integer_part > 0 else "0"
+
+    if remainder == 0:
+        return f"{sign}{int_str}"
+
+    # Fractional part - long division with repeating detection
+    fractional_point = ";" if base == 60 else "."
+    frac_digits: list[str] = []
+    seen: dict[int, int] = {}
+    r = remainder
+    repeating_start: int | None = None
+
+    while r != 0 and r not in seen and len(frac_digits) < max_digits:
+        seen[r] = len(frac_digits)
+        r *= base
+        digit_val = r // den
+        frac_digits.append(base_digit_symbol(digit_val, base))
+        r = r % den
+
+    # Join fractional digits with comma for base 60
+    if base == 60:
+        frac_joined = ",".join(frac_digits)
+    else:
+        frac_joined = "".join(frac_digits)
+
+    if r in seen:
+        repeating_start = seen[r]
+        if base == 60:
+            non_repeating = ",".join(frac_digits[:repeating_start])
+            repeating = ",".join(frac_digits[repeating_start:])
+            # Add comma between non-repeating and repeating if both exist
+            if non_repeating and repeating:
+                return f"{sign}{int_str}{fractional_point}{non_repeating},({repeating})"
+            elif non_repeating:
+                return f"{sign}{int_str}{fractional_point}{non_repeating}"
+            else:
+                return f"{sign}{int_str}{fractional_point}({repeating})"
+        else:
+            non_repeating = "".join(frac_digits[:repeating_start])
+            repeating = "".join(frac_digits[repeating_start:])
+            return f"{sign}{int_str}{fractional_point}{non_repeating}({repeating})"
+    elif r == 0:
+        return f"{sign}{int_str}{fractional_point}{frac_joined}"
+    else:
+        # Hit max_digits limit
+        return f"{sign}{int_str}{fractional_point}{frac_joined}..."
+
+
+def rational_from_base(s: str, base: int) -> Rational:
+    """Parse a string representation in the given base to an exact Rational.
+
+    Args:
+        s: String representation in the given base, optionally with
+           repeating part in parentheses (e.g., "0.3(3)" for 1/3 in base 10)
+        base: Source base (10, 12, or 60)
+
+    Returns:
+        Exact Rational value
+
+    Raises:
+        ValueError: If base is not supported or string format is invalid
+    """
+    if base not in (10, 12, 60):
+        raise ValueError(f"unsupported base: {base}. Supported bases: 10, 12, 60")
+    if not s:
+        raise ValueError("empty string")
+
+    sign = 1
+    if s.startswith("-"):
+        sign = -1
+        s = s[1:]
+
+    # Find fractional point and repeating part
+    fractional_point = ";" if base == 60 else "."
+    has_repeating = False
+    repeating_token_index = 0
+
+    # Find parentheses BEFORE removing them - track position in fractional part
+    paren_start = -1
+    paren_end = -1
+    if "(" in s:
+        if ")" not in s:
+            raise ValueError("unclosed parenthesis in repeating part")
+        paren_start = s.index("(")
+        paren_end = s.index(")")
+        if paren_end <= paren_start + 1:
+            raise ValueError("empty repeating part")
+        has_repeating = True
+
+    # Split integer and fractional parts (before removing parens for accurate position)
+    if fractional_point in s:
+        int_part, frac_part_with_parens = s.split(fractional_point, 1)
+    else:
+        int_part, frac_part_with_parens = s, ""
+
+    # Now remove parentheses from fractional part for token parsing
+    if has_repeating:
+        # paren_start is absolute in s; find relative position in frac_part_with_parens
+        frac_start_in_s = len(int_part) + 1  # +1 for fractional_point
+        paren_start_in_frac = paren_start - frac_start_in_s
+        paren_end_in_frac = paren_end - frac_start_in_s
+        # Remove parentheses
+        frac_part = (frac_part_with_parens[:paren_start_in_frac] +
+                     frac_part_with_parens[paren_start_in_frac+1:paren_end_in_frac] +
+                     frac_part_with_parens[paren_end_in_frac+1:])
+    else:
+        frac_part = frac_part_with_parens
+
+    # Parse integer part
+    int_val = int_from_base(int_part, base) if int_part else 0
+
+    if not frac_part and not has_repeating:
+        return Rational(sign * int_val)
+
+    digit_values = digit_value_for_base(base)
+
+    # For base 60, split fractional part by commas into tokens
+    if base == 60:
+        frac_tokens = frac_part.split(",") if frac_part else []
+    else:
+        frac_tokens = list(frac_part)
+
+    if has_repeating:
+        # Find the token index where repeating starts
+        if base == 60:
+            # paren_start_in_frac is the position of '(' in the original frac string
+            # After removing '(', the first repeating character is at paren_start_in_frac
+            # (since '(' was removed, everything shifts left by 1)
+            token_pos = paren_start_in_frac
+            pos = 0
+            for i, token in enumerate(frac_tokens):
+                if pos + len(token) > token_pos:
+                    repeating_token_index = i
+                    break
+                pos += len(token) + 1  # +1 for comma
+            else:
+                repeating_token_index = len(frac_tokens)
+        else:
+            # For base 10/12, each character is a token
+            token_pos = paren_start_in_frac
+            repeating_token_index = max(0, token_pos)
+
+    if not has_repeating:
+        # Terminating fraction
+        frac_val = 0
+        for token in frac_tokens:
+            if not token:
+                continue
+            if base == 60 and token.startswith("<"):
+                if not token.endswith(">"):
+                    raise ValueError(f"unclosed angle bracket in base-60 fraction: {token}")
+            if token not in digit_values:
+                raise ValueError(f"invalid digit {token!r} for base {base}")
+            frac_val = frac_val * base + digit_values[token]
+        den = base ** len(frac_tokens)
+        return Rational(sign * (int_val * den + frac_val), den)
+
+    # Repeating fraction
+    non_repeating_tokens = frac_tokens[:repeating_token_index]
+    repeating_tokens = frac_tokens[repeating_token_index:]
+
+    # Value = int_part + non_repeating/base^k + repeating/(base^k * (base^m - 1))
+    # where k = len(non_repeating), m = len(repeating)
+    k = len(non_repeating_tokens)
+    m = len(repeating_tokens)
+
+    # Parse non-repeating part
+    non_rep_val = 0
+    for token in non_repeating_tokens:
+        if token not in digit_values:
+            raise ValueError(f"invalid digit {token!r} for base {base}")
+        non_rep_val = non_rep_val * base + digit_values[token]
+
+    # Parse repeating part
+    rep_val = 0
+    for token in repeating_tokens:
+        if token not in digit_values:
+            raise ValueError(f"invalid digit {token!r} for base {base}")
+        rep_val = rep_val * base + digit_values[token]
+
+    # Exact rational computation
+    # integer part: int_val
+    # non-repeating: non_rep_val / base^k
+    # repeating: rep_val / (base^k * (base^m - 1))
+
+    base_k = base ** k
+    base_m = base ** m
+    rep_den = base_m - 1
+
+    num = int_val * base_k * rep_den + non_rep_val * rep_den + rep_val
+    den = base_k * rep_den
+
+    return Rational(sign * num, den)
+
+
+# -- Terminating / repeating detection helpers ---------------------------------
+
+def is_terminating_in_base(denominator: int, base: int) -> bool:
+    """Return True if 1/denominator has a terminating representation in base.
+
+    A rational p/q (in lowest terms) terminates in integer base b iff
+    every prime factor of q divides b.
+    """
+    if base < 2:
+        raise ValueError("base must be >= 2")
+    if denominator <= 0:
+        raise ValueError("denominator must be positive")
+
+    q = denominator
+    b = base
+    d = 2
+    while d * d <= b:
+        while b % d == 0:
+            while q % d == 0:
+                q //= d
+            b //= d
+        d += 1
+    if b > 1:
+        while q % b == 0:
+            q //= b
+    return q == 1
+
+
+def repeating_period_in_base(denominator: int, base: int) -> int | None:
+    """Return the length of the repeating period of 1/denominator in base,
+    or None if it terminates.
+
+    The period is the multiplicative order of base modulo q, where q is
+    the denominator after removing all prime factors that divide base.
+    """
+    if base < 2:
+        raise ValueError("base must be >= 2")
+    if denominator <= 0:
+        raise ValueError("denominator must be positive")
+
+    if is_terminating_in_base(denominator, base):
+        return None
+
+    q = denominator
+    g = gcd(q, base)
+    while g > 1:
+        while q % g == 0:
+            q //= g
+        g = gcd(q, base)
+
+    if q == 1:
+        return None
+
+    # Multiplicative order of base mod q
+    x = base % q
+    if x == 0 or gcd(x, q) != 1:
+        return None
+
+    seen = x % q
+    k = 1
+    while seen != 1:
+        seen = (seen * x) % q
+        k += 1
+        if k > q:  # safety bound
+            return None
+    return k
+
+
+def terminating_denominators(base: int, limit: int = 360) -> list[int]:
+    """Return all denominators 1..limit whose reciprocals terminate in base."""
+    if base not in (10, 12, 60):
+        raise ValueError(f"unsupported base: {base}. Supported bases: 10, 12, 60")
+    return [
+        d for d in range(1, limit + 1)
+        if is_terminating_in_base(d, base)
+    ]
+
+
+# -- Base conversion for arbitrary integers ------------------------------------
+
+def convert_base(s: str, from_base: int, to_base: int) -> str:
+    """Convert a string representation from one base to another.
+
+    Args:
+        s: String in from_base
+        from_base: Source base (10, 12, or 60)
+        to_base: Target base (10, 12, or 60)
+
+    Returns:
+        String representation in to_base
+    """
+    if from_base == to_base:
+        return s
+
+    # Parse to integer, then convert to target base
+    val = int_from_base(s, from_base)
+    return int_to_base(val, to_base)
+
+
+def convert_rational_base(s: str, from_base: int, to_base: int) -> str:
+    """Convert a rational string representation from one base to another.
+
+    Handles both terminating and repeating representations.
+    """
+    if from_base == to_base:
+        return s
+
+    val = rational_from_base(s, from_base)
+    return rational_to_base(val, to_base)
+
+
+# -- Export --------------------------------------------------------------------
+
+__all__ = [
+    # Digit symbols
+    "DIGITS_10",
+    "DIGITS_12",
+    "DIGITS_60",
+    "DIGIT_VALUE_10",
+    "DIGIT_VALUE_12",
+    "DIGIT_VALUE_60",
+    "digits_for_base",
+    "digit_value_for_base",
+    "base_digit_symbol",
+    # Integer conversion
+    "int_to_base",
+    "int_from_base",
+    # Rational conversion
+    "rational_to_base",
+    "rational_from_base",
+    # Terminating/repeating
+    "is_terminating_in_base",
+    "repeating_period_in_base",
+    "terminating_denominators",
+    # Base conversion
+    "convert_base",
+    "convert_rational_base",
+]

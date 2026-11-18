@@ -1,0 +1,54 @@
+"""base60lab — exact rational arithmetic across base-10, base-12 and base-60.
+
+Architecture:
+  core/       shared types, rational arithmetic, unknowns registry
+  engines/    base10_engine, base12_engine, base60_engine (own all expressions,
+              notations, functions per base)
+  domains/    fractions, angles, geometry, ... (delegate to engines)
+
+Base-10 is treated as a well-understood reference system (known truths).
+Base-12 and base-60 encode known truths plus an updatable unknowns registry;
+experiments may amend entries in place as new truths are revealed.
+
+No floating-point is used for internal arithmetic.
+"""
+
+from .core import Rational, BaseNumber, Expression, Notation, Function, UnknownsRegistry
+from .engines import Base10Engine, Base12Engine, Base60Engine
+from .domains.fractions import FractionsDomain
+from . import angles
+from . import geometry
+from . import trigonometry
+from . import fft_benchmarks
+from . import wave
+from . import rns_ntt
+try:
+    from . import sequences
+    from . import frequency
+    from . import lissajous
+    from . import signal_processing
+    from . import cordic
+    from . import quantum
+except ImportError:
+    quantum = None  # type: ignore[assignment]
+
+__all__ = [
+    "Rational", "BaseNumber", "Expression", "Notation", "Function",
+    "UnknownsRegistry",
+    "Base10Engine", "Base12Engine", "Base60Engine",
+    "FractionsDomain",
+    "angles",
+    "geometry",
+    "trigonometry",
+    "modular",
+    "sequences",
+    "frequency",
+    "lissajous",
+    "signal_processing",
+    "fft_benchmarks",
+    "cordic",
+    "wave",
+    "rns_ntt",
+    "numerals",
+    "quantum",
+]

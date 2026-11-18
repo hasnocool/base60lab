@@ -1,0 +1,241 @@
+"""Number sequences with exact rational arithmetic.
+
+All sequences are generated using Rational for exact rational terms.
+No floating-point arithmetic is used internally.
+"""
+
+from __future__ import annotations
+
+from .core.rational import Rational
+
+
+def fibonacci(count: int) -> list[Rational]:
+    """Generate the first `count` Fibonacci numbers.
+    
+    F(0) = 0, F(1) = 1, F(n) = F(n-1) + F(n-2)
+    
+    Args:
+        count: Number of Fibonacci numbers to generate (must be >= 0)
+    
+    Returns:
+        List of Rational Fibonacci numbers
+    
+    Raises:
+        ValueError: If count is negative
+    """
+    if count < 0:
+        raise ValueError("count must be non-negative")
+    if count == 0:
+        return []
+    if count == 1:
+        return [Rational(0)]
+    
+    result = [Rational(0), Rational(1)]
+    for _ in range(2, count):
+        result.append(result[-1] + result[-2])
+    return result
+
+
+def triangular(count: int) -> list[Rational]:
+    """Generate the first `count` triangular numbers.
+    
+    T(n) = n * (n + 1) / 2
+    
+    Args:
+        count: Number of triangular numbers to generate (must be >= 0)
+    
+    Returns:
+        List of Rational triangular numbers
+    
+    Raises:
+        ValueError: If count is negative
+    """
+    if count < 0:
+        raise ValueError("count must be non-negative")
+    
+    return [Rational(n * (n + 1), 2) for n in range(count)]
+
+
+def square(count: int) -> list[Rational]:
+    """Generate the first `count` square numbers.
+    
+    S(n) = n^2
+    
+    Args:
+        count: Number of square numbers to generate (must be >= 0)
+    
+    Returns:
+        List of Rational square numbers
+    
+    Raises:
+        ValueError: If count is negative
+    """
+    if count < 0:
+        raise ValueError("count must be non-negative")
+    
+    return [Rational(n * n) for n in range(count)]
+
+
+def cube(count: int) -> list[Rational]:
+    """Generate the first `count` cube numbers.
+    
+    C(n) = n^3
+    
+    Args:
+        count: Number of cube numbers to generate (must be >= 0)
+    
+    Returns:
+        List of Rational cube numbers
+    
+    Raises:
+        ValueError: If count is negative
+    """
+    if count < 0:
+        raise ValueError("count must be non-negative")
+    
+    return [Rational(n * n * n) for n in range(count)]
+
+
+def perfect(count: int) -> list[Rational]:
+    """Generate the first `count` perfect numbers.
+    
+    A perfect number equals the sum of its proper divisors.
+    Known perfect numbers: 6, 28, 496, 8128, 33550336, ...
+    
+    Args:
+        count: Number of perfect numbers to generate (must be >= 0)
+    
+    Returns:
+        List of Rational perfect numbers
+    
+    Raises:
+        ValueError: If count is negative
+    """
+    if count < 0:
+        raise ValueError("count must be non-negative")
+    if count == 0:
+        return []
+    
+    # Known perfect numbers (Mersenne prime based: 2^(p-1) * (2^p - 1) where 2^p - 1 is prime)
+    # We generate them using the Euclid-Euler theorem
+    perfect_numbers = []
+    p = 2
+    while len(perfect_numbers) < count:
+        mersenne = (1 << p) - 1  # 2^p - 1
+        if _is_prime(mersenne):
+            perfect_num = (1 << (p - 1)) * mersenne  # 2^(p-1) * (2^p - 1)
+            perfect_numbers.append(Rational(perfect_num))
+        p += 1
+        # Safety bound: the 8th perfect number is already huge
+        if p > 31 and len(perfect_numbers) < count:
+            break
+    return perfect_numbers[:count]
+
+
+def _is_prime(n: int) -> bool:
+    """Check if n is prime (simple deterministic test for small n)."""
+    if n < 2:
+        return False
+    if n == 2:
+        return True
+    if n % 2 == 0:
+        return False
+    i = 3
+    while i * i <= n:
+        if n % i == 0:
+            return False
+        i += 2
+    return True
+
+
+def prime(count: int) -> list[Rational]:
+    """Generate the first `count` prime numbers.
+    
+    Args:
+        count: Number of prime numbers to generate (must be >= 0)
+    
+    Returns:
+        List of Rational prime numbers
+    
+    Raises:
+        ValueError: If count is negative
+    """
+    if count < 0:
+        raise ValueError("count must be non-negative")
+    if count == 0:
+        return []
+    
+    result = []
+    n = 2
+    while len(result) < count:
+        if _is_prime(n):
+            result.append(Rational(n))
+        n += 1
+    return result
+
+
+def geometric(count: int, ratio: Rational | int = 2, start: Rational | int = 1) -> list[Rational]:
+    """Generate the first `count` terms of a geometric sequence.
+    
+    G(n) = start * ratio^n
+    
+    Args:
+        count: Number of terms to generate (must be >= 0)
+        ratio: Common ratio (default 2)
+        start: First term (default 1)
+    
+    Returns:
+        List of Rational geometric sequence terms
+    
+    Raises:
+        ValueError: If count is negative
+    """
+    if count < 0:
+        raise ValueError("count must be non-negative")
+    
+    ratio = Rational(ratio) if not isinstance(ratio, Rational) else ratio
+    start = Rational(start) if not isinstance(start, Rational) else start
+    
+    result = []
+    current = start
+    for _ in range(count):
+        result.append(current)
+        current = current * ratio
+    return result
+
+
+def harmonic(count: int) -> list[Rational]:
+    """Generate the first `count` harmonic numbers.
+    
+    H(n) = 1 + 1/2 + 1/3 + ... + 1/n
+    
+    Args:
+        count: Number of harmonic numbers to generate (must be >= 0)
+    
+    Returns:
+        List of Rational harmonic numbers
+    
+    Raises:
+        ValueError: If count is negative
+    """
+    if count < 0:
+        raise ValueError("count must be non-negative")
+    
+    result = []
+    current = Rational(0)
+    for n in range(1, count + 1):
+        current = current + Rational(1, n)
+        result.append(current)
+    return result
+
+
+__all__ = [
+    "fibonacci",
+    "triangular",
+    "square",
+    "cube",
+    "perfect",
+    "prime",
+    "geometric",
+    "harmonic",
+]

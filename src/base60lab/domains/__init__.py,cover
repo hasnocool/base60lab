@@ -1,0 +1,6 @@
+> """Domain modules: fractions, angles, geometry, etc.
+  
+> Each domain delegates base-specific arithmetic to the base engines
+> (base10_engine, base12_engine, base60_engine) instead of re-implementing
+> per-base logic.
+> """

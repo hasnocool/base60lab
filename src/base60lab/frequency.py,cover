@@ -1,0 +1,311 @@
+> """Frequency ratios, harmonics, and phase for exact rational arithmetic.
+  
+> This module provides exact rational representations for musical frequency ratios,
+> harmonic series, and phase as fractions of a complete turn. All internal
+> arithmetic uses Rational numbers — never floating-point.
+> """
+  
+> from __future__ import annotations
+  
+> from dataclasses import dataclass
+> from typing import Union
+  
+> from .core.rational import Rational
+  
+  
+> def ratio_to_fraction(numerator: int, denominator: int = 1) -> Rational:
+>     """Return the exact rational representation of a frequency ratio.
+  
+>     Args:
+>         numerator: Frequency ratio numerator (must be positive).
+>         denominator: Frequency ratio denominator (must be positive).
+  
+>     Returns:
+>         Rational representing the exact ratio in lowest terms.
+  
+>     Raises:
+>         ValueError: If numerator or denominator is not positive.
+>         ZeroDivisionError: If denominator is zero.
+  
+>     Examples:
+>         >>> ratio_to_fraction(2, 1)
+>         Rational(2)
+>         >>> ratio_to_fraction(3, 2)
+>         Rational(3/2)
+>         >>> ratio_to_fraction(5, 4)
+>         Rational(5/4)
+>     """
+>     if numerator <= 0:
+>         raise ValueError("numerator must be positive")
+>     if denominator <= 0:
+>         raise ValueError("denominator must be positive")
+>     return Rational(numerator, denominator)
+  
+  
+> @dataclass(frozen=True, order=True)
+> class FrequencyRatio:
+>     """An exact frequency ratio p/q in lowest terms.
+  
+>     Represents the ratio between two frequencies as an exact rational number.
+>     All arithmetic operations preserve exactness using Rational internally.
+>     """
+  
+>     _value: Rational
+  
+>     def __init__(
+>         self,
+>         numerator: int | Rational,
+>         denominator: int = 1,
+>     ) -> None:
+>         if isinstance(numerator, Rational):
+>             value = numerator
+>         else:
+>             if numerator <= 0:
+>                 raise ValueError("numerator must be positive")
+>             if denominator == 0:
+>                 raise ZeroDivisionError("denominator cannot be zero")
+>             if denominator < 0:
+>                 raise ValueError("denominator must be positive")
+>             value = Rational(numerator, denominator)
+>         object.__setattr__(self, "_value", value)
+  
+>     @property
+>     def value(self) -> Rational:
+>         """The exact rational value of this frequency ratio."""
+>         return self._value
+  
+>     @property
+>     def numerator(self) -> int:
+>         """Numerator of the ratio in lowest terms."""
+>         return self._value.numerator
+  
+>     @property
+>     def denominator(self) -> int:
+>         """Denominator of the ratio in lowest terms."""
+>         return self._value.denominator
+  
+>     def __mul__(self, other: FrequencyRatio) -> FrequencyRatio:
+>         """Multiply two frequency ratios (add intervals)."""
+>         if not isinstance(other, FrequencyRatio):
+>             return NotImplemented
+>         return FrequencyRatio(self._value * other._value)
+  
+>     def __truediv__(self, other: FrequencyRatio) -> FrequencyRatio:
+>         """Divide two frequency ratios (subtract intervals)."""
+>         if not isinstance(other, FrequencyRatio):
+>             return NotImplemented
+>         return FrequencyRatio(self._value / other._value)
+  
+>     def __pow__(self, exponent: int) -> FrequencyRatio:
+>         """Raise frequency ratio to an integer power."""
+>         return FrequencyRatio(self._value ** exponent)
+  
+>     def __eq__(self, other: object) -> bool:
+>         if not isinstance(other, FrequencyRatio):
+>             return NotImplemented
+>         return self._value == other._value
+  
+>     def __hash__(self) -> int:
+>         return hash(self._value)
+  
+>     def __str__(self) -> str:
+>         return f"{self.numerator}:{self.denominator}"
+  
+>     def __repr__(self) -> str:
+>         return f"FrequencyRatio({self.numerator}, {self.denominator})"
+  
+      # Common musical intervals as class attributes
+>     UNISON = None  # type: ignore[assignment]
+>     OCTAVE = None  # type: ignore[assignment]
+>     PERFECT_FIFTH = None  # type: ignore[assignment]
+>     PERFECT_FOURTH = None  # type: ignore[assignment]
+>     MAJOR_THIRD = None  # type: ignore[assignment]
+>     MAJOR_SIXTH = None  # type: ignore[assignment]
+>     MINOR_THIRD = None  # type: ignore[assignment]
+>     MINOR_SIXTH = None  # type: ignore[assignment]
+>     MAJOR_SECOND = None  # type: ignore[assignment]
+>     MINOR_SECOND = None  # type: ignore[assignment]
+>     TRITONE = None  # type: ignore[assignment]
+  
+  
+  # Initialize common musical intervals
+> FrequencyRatio.UNISON = FrequencyRatio(1, 1)
+> FrequencyRatio.OCTAVE = FrequencyRatio(2, 1)
+> FrequencyRatio.PERFECT_FIFTH = FrequencyRatio(3, 2)
+> FrequencyRatio.PERFECT_FOURTH = FrequencyRatio(4, 3)
+> FrequencyRatio.MAJOR_THIRD = FrequencyRatio(5, 4)
+> FrequencyRatio.MAJOR_SIXTH = FrequencyRatio(5, 3)
+> FrequencyRatio.MINOR_THIRD = FrequencyRatio(6, 5)
+> FrequencyRatio.MINOR_SIXTH = FrequencyRatio(8, 5)
+> FrequencyRatio.MAJOR_SECOND = FrequencyRatio(9, 8)
+> FrequencyRatio.MINOR_SECOND = FrequencyRatio(16, 15)
+> FrequencyRatio.TRITONE = FrequencyRatio(45, 32)
+  
+  
+> @dataclass(frozen=True, order=True)
+> class Harmonic:
+>     """A harmonic in the harmonic series.
+  
+>     The n-th harmonic has frequency n times the fundamental frequency.
+>     Represented as an exact FrequencyRatio relative to the fundamental.
+>     """
+  
+>     number: int
+  
+>     def __post_init__(self) -> None:
+>         if self.number <= 0:
+>             raise ValueError("harmonic number must be positive")
+  
+>     @property
+>     def ratio(self) -> FrequencyRatio:
+>         """Frequency ratio of this harmonic relative to the fundamental."""
+>         return FrequencyRatio(self.number, 1)
+  
+>     @classmethod
+>     def series(cls, count: int) -> tuple[Harmonic, ...]:
+>         """Return the first `count` harmonics as a tuple.
+  
+>         Args:
+>             count: Number of harmonics to generate (must be positive).
+  
+>         Returns:
+>             Tuple of Harmonic objects for harmonics 1 through count.
+>         """
+>         if count <= 0:
+>             raise ValueError("count must be positive")
+>         return tuple(cls(n) for n in range(1, count + 1))
+  
+>     def __str__(self) -> str:
+>         return f"Harmonic({self.number})"
+  
+>     def __repr__(self) -> str:
+>         return f"Harmonic({self.number})"
+  
+  
+> @dataclass(frozen=True, order=True)
+> class Phase:
+>     """Phase as a fraction of a complete turn (1 turn = 2π radians = 360°).
+  
+>     Phase values are always normalized to [0, 1) — equivalent to angles
+>     modulo 2π. All arithmetic is exact using Rational.
+>     """
+  
+>     _value: Rational
+  
+>     def __init__(
+>         self,
+>         numerator: int | Rational,
+>         denominator: int = 1,
+>     ) -> None:
+>         if isinstance(numerator, Rational):
+>             value = numerator
+>         else:
+>             if denominator <= 0:
+>                 raise ValueError("denominator must be positive")
+>             value = Rational(numerator, denominator)
+          # Normalize to [0, 1)
+>         normalized = value - Rational(int(value.numerator // value.denominator))
+>         object.__setattr__(self, "_value", normalized)
+  
+>     @property
+>     def value(self) -> Rational:
+>         """Phase as a rational fraction in [0, 1)."""
+>         return self._value
+  
+>     @property
+>     def numerator(self) -> int:
+>         """Numerator of the phase fraction in lowest terms."""
+>         return self._value.numerator
+  
+>     @property
+>     def denominator(self) -> int:
+>         """Denominator of the phase fraction in lowest terms."""
+>         return self._value.denominator
+  
+>     def __add__(self, other: Phase) -> Phase:
+>         """Add two phases (modulo 1)."""
+>         if not isinstance(other, Phase):
+>             return NotImplemented
+>         return Phase(self._value + other._value)
+  
+>     def __sub__(self, other: Phase) -> Phase:
+>         """Subtract two phases (modulo 1)."""
+>         if not isinstance(other, Phase):
+>             return NotImplemented
+>         return Phase(self._value - other._value)
+  
+>     def __mul__(self, scalar: int) -> Phase:
+>         """Multiply phase by an integer."""
+>         if not isinstance(scalar, int):
+>             return NotImplemented
+>         return Phase(self._value * scalar)
+  
+>     def __eq__(self, other: object) -> bool:
+>         if not isinstance(other, Phase):
+>             return NotImplemented
+>         return self._value == other._value
+  
+>     def __hash__(self) -> int:
+>         return hash(self._value)
+  
+>     def __str__(self) -> str:
+>         if self._value.numerator == 0:
+>             return "Phase(0)"
+>         if self._value.denominator == 1:
+!             return f"Phase({self._value.numerator})"
+>         return f"Phase({self._value.numerator}/{self._value.denominator})"
+  
+>     def __repr__(self) -> str:
+>         return f"Phase({self._value.numerator}, {self._value.denominator})"
+  
+>     def to_frequency_ratio(self, samples_per_turn: int) -> FrequencyRatio:
+>         """Convert phase increment per sample to frequency ratio.
+  
+>         Given a phase increment per sample and the number of samples per
+>         complete turn, returns the frequency as a ratio of the sample rate.
+  
+>         Args:
+>             samples_per_turn: Number of samples in one complete turn.
+  
+>         Returns:
+>             FrequencyRatio representing frequency/sample_rate.
+  
+>         Example:
+>             Phase(1, 100) with 100 samples_per_turn = 1/100 turn per sample
+>             -> frequency ratio 1/100 (one cycle per 100 samples)
+>         """
+>         if samples_per_turn <= 0:
+>             raise ValueError("samples_per_turn must be positive")
+          # frequency = phase_per_sample * samples_per_turn
+          # but we want frequency/sample_rate = phase_per_sample
+          # Actually: if phase advances by p per sample, then after N samples
+          # it advances by p*N. One turn = 1. So frequency in cycles/sample = p.
+          # Frequency ratio relative to sample rate = p.
+>         return FrequencyRatio(self._value)
+  
+>     def to_degrees(self) -> Rational:
+>         """Convert phase to degrees (exact rational)."""
+>         return self._value * Rational(360)
+  
+>     def to_radians(self) -> Rational:
+>         """Convert phase to radians (exact rational multiple of π).
+  
+>         Returns phase * 2π as a rational multiple of π.
+>         """
+>         return self._value * Rational(2)
+  
+  
+  # Common phase constants
+> Phase.ZERO = Phase(0, 1)
+> Phase.QUARTER_TURN = Phase(1, 4)   # 90°
+> Phase.HALF_TURN = Phase(1, 2)      # 180°
+> Phase.THREE_QUARTER_TURN = Phase(3, 4)  # 270°
+> Phase.FULL_TURN = Phase(1, 1)      # 360° = 0°
+  
+  
+> __all__ = [
+>     "ratio_to_fraction",
+>     "FrequencyRatio",
+>     "Harmonic",
+>     "Phase",
+> ]

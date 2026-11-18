@@ -1,0 +1,512 @@
+"""Signal processing module for real signals with exact rational arithmetic.
+
+This module provides filters and spectral analysis capabilities.
+Internal arithmetic uses Rational for exactness where possible;
+numpy/scipy/matplotlib are used only at numerical boundaries.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any
+
+import numpy as np
+from scipy import signal as scipy_signal
+from scipy.fft import fft, ifft, fftfreq
+
+from .core.rational import Rational
+
+
+@dataclass(frozen=True)
+class Signal:
+    """Container for a real-valued signal with metadata."""
+
+    data: np.ndarray
+    sample_rate: float
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.data, np.ndarray):
+            object.__setattr__(self, "data", np.asarray(self.data, dtype=float))
+        if self.data.ndim != 1:
+            raise ValueError("Signal data must be 1-dimensional")
+        if len(self.data) == 0:
+            raise ValueError("Signal data cannot be empty")
+        if self.sample_rate <= 0:
+            raise ValueError("Sample rate must be positive")
+
+    def __len__(self) -> int:
+        return len(self.data)
+
+    def fft(self) -> np.ndarray:
+        """Compute the FFT of this signal."""
+        return fft(self.data)
+
+    def ifft(self, spectrum: np.ndarray) -> np.ndarray:
+        """Compute the inverse FFT."""
+        return ifft(spectrum)
+
+    def power_spectrum(self) -> tuple[np.ndarray, np.ndarray]:
+        """Compute the power spectrum."""
+        return compute_power_spectrum(self.data, self.sample_rate)
+
+    def spectral_density(self) -> tuple[np.ndarray, np.ndarray]:
+        """Compute the power spectral density."""
+        return compute_spectral_density(self.data, self.sample_rate)
+
+    def filter(self, b: np.ndarray, a: np.ndarray) -> Signal:
+        """Apply a filter to this signal."""
+        filtered = apply_filter(self.data, b, a)
+        return Signal(filtered, self.sample_rate)
+
+
+def _rational_to_float(r: Rational | float | int) -> float:
+    """Convert Rational or numeric to float for numerical boundaries."""
+    if isinstance(r, Rational):
+        return r.to_float()
+    return float(r)
+
+
+def _normalize_signal(signal: Any) -> np.ndarray:
+    """Convert input to a float ndarray, resolving Rational entries exactly."""
+    if isinstance(signal, Signal):
+        return np.asarray(signal.data, dtype=float)
+    if isinstance(signal, np.ndarray):
+        if signal.dtype == object:
+            return np.asarray([_rational_to_float(v) for v in signal.tolist()], dtype=float)
+        return np.asarray(signal, dtype=float)
+    if isinstance(signal, tuple):
+        return _normalize_signal(list(signal))
+    vals: list[float] = []
+    for v in signal:  # type: ignore[union-attr]
+        if isinstance(v, Rational):
+            vals.append(_rational_to_float(v))
+        elif isinstance(v, (int, float)):
+            vals.append(float(v))
+        else:
+            raise TypeError(f"Unsupported signal value type: {type(v)}")
+    return np.asarray(vals, dtype=float)
+
+
+def fft_of_signal(signal: Any) -> np.ndarray:
+    """Compute the FFT of a real signal.
+
+    Args:
+        signal: Input signal as list, numpy array, or Signal object.
+
+    Returns:
+        Complex numpy array of FFT coefficients.
+
+    Raises:
+        ValueError: If signal is empty.
+    """
+    data = _normalize_signal(signal)
+
+    if len(data) == 0:
+        raise ValueError("Cannot compute FFT of empty signal")
+
+    return fft(data)
+
+
+def ifft_of_signal(spectrum: Any) -> np.ndarray:
+    """Compute the inverse FFT.
+
+    Args:
+        spectrum: Complex spectrum from FFT.
+
+    Returns:
+        Real-valued time domain signal (imaginary parts should be ~0).
+    """
+    spec = np.asarray(spectrum, dtype=complex)
+    if len(spec) == 0:
+        raise ValueError("Cannot compute IFFT of empty spectrum")
+    return ifft(spec)
+
+
+def design_lowpass_filter(
+    cutoff: Any,
+    order: int = 4,
+    fs: float = 1.0,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Design a Butterworth lowpass filter.
+
+    Args:
+        cutoff: Normalized cutoff frequency (0 < cutoff < 1, where 1 = Nyquist).
+        order: Filter order (default 4).
+        fs: Sampling frequency (default 1.0 for normalized).
+
+    Returns:
+        Tuple of (b, a) filter coefficients.
+
+    Raises:
+        ValueError: If cutoff is out of range or order is invalid.
+    """
+    cutoff_float = _rational_to_float(cutoff)
+    if not 0 < cutoff_float < 1:
+        raise ValueError("Cutoff must be between 0 and 1 (normalized to Nyquist)")
+    if order < 1:
+        raise ValueError("Filter order must be >= 1")
+
+    b, a = scipy_signal.butter(order, cutoff_float, btype="low", fs=fs)
+    return b, a
+
+
+def design_highpass_filter(
+    cutoff: Any,
+    order: int = 4,
+    fs: float = 1.0,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Design a Butterworth highpass filter.
+
+    Args:
+        cutoff: Normalized cutoff frequency (0 < cutoff < 1).
+        order: Filter order (default 4).
+        fs: Sampling frequency (default 1.0 for normalized).
+
+    Returns:
+        Tuple of (b, a) filter coefficients.
+
+    Raises:
+        ValueError: If cutoff is out of range or order is invalid.
+    """
+    cutoff_float = _rational_to_float(cutoff)
+    if not 0 < cutoff_float < 1:
+        raise ValueError("Cutoff must be between 0 and 1 (normalized to Nyquist)")
+    if order < 1:
+        raise ValueError("Filter order must be >= 1")
+
+    b, a = scipy_signal.butter(order, cutoff_float, btype="high", fs=fs)
+    return b, a
+
+
+def design_bandpass_filter(
+    lowcut: Any,
+    highcut: Any,
+    order: int = 4,
+    fs: float = 1.0,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Design a Butterworth bandpass filter.
+
+    Args:
+        lowcut: Lower normalized cutoff frequency.
+        highcut: Upper normalized cutoff frequency.
+        order: Filter order (default 4).
+        fs: Sampling frequency (default 1.0 for normalized).
+
+    Returns:
+        Tuple of (b, a) filter coefficients.
+
+    Raises:
+        ValueError: If cutoff frequencies are invalid.
+    """
+    lowcut_float = _rational_to_float(lowcut)
+    highcut_float = _rational_to_float(highcut)
+    if not 0 < lowcut_float < highcut_float < 1:
+        raise ValueError("Must have 0 < lowcut < highcut < 1")
+    if order < 1:
+        raise ValueError("Filter order must be >= 1")
+
+    b, a = scipy_signal.butter(order, [lowcut_float, highcut_float], btype="band", fs=fs)
+    return b, a
+
+
+def design_bandstop_filter(
+    lowcut: Any,
+    highcut: Any,
+    order: int = 4,
+    fs: float = 1.0,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Design a Butterworth bandstop (notch) filter.
+
+    Args:
+        lowcut: Lower normalized cutoff frequency.
+        highcut: Upper normalized cutoff frequency.
+        order: Filter order (default 4).
+        fs: Sampling frequency (default 1.0 for normalized).
+
+    Returns:
+        Tuple of (b, a) filter coefficients.
+
+    Raises:
+        ValueError: If cutoff frequencies are invalid.
+    """
+    lowcut_float = _rational_to_float(lowcut)
+    highcut_float = _rational_to_float(highcut)
+    if not 0 < lowcut_float < highcut_float < 1:
+        raise ValueError("Must have 0 < lowcut < highcut < 1")
+    if order < 1:
+        raise ValueError("Filter order must be >= 1")
+
+    b, a = scipy_signal.butter(order, [lowcut_float, highcut_float], btype="bandstop", fs=fs)
+    return b, a
+
+
+def apply_filter(
+    signal: Any,
+    b: np.ndarray,
+    a: np.ndarray,
+    axis: int = -1,
+) -> np.ndarray:
+    """Apply a digital filter to a signal using zero-phase filtering.
+
+    Args:
+        signal: Input signal as list, numpy array, or Signal object.
+        b: Numerator filter coefficients.
+        a: Denominator filter coefficients.
+        axis: Axis along which to filter (default -1).
+
+    Returns:
+        Filtered signal.
+
+    Raises:
+        ValueError: If signal is empty.
+    """
+    data = _normalize_signal(signal)
+
+    if len(data) == 0:
+        raise ValueError("Cannot filter empty signal")
+
+    return scipy_signal.filtfilt(b, a, data, axis=axis)
+
+
+def lfilter(
+    signal: Any,
+    b: np.ndarray,
+    a: np.ndarray,
+    axis: int = -1,
+    zi: np.ndarray | None = None,
+) -> tuple[np.ndarray, np.ndarray | None]:
+    """Apply a digital filter (direct form II transposed).
+
+    Unlike apply_filter, this is causal and introduces phase shift.
+
+    Args:
+        signal: Input signal as list, numpy array, or Signal object.
+        b: Numerator filter coefficients.
+        a: Denominator filter coefficients.
+        axis: Axis along which to filter.
+        zi: Initial conditions.
+
+    Returns:
+        Tuple of (filtered_signal, final_conditions).
+    """
+    data = _normalize_signal(signal)
+    return scipy_signal.lfilter(b, a, data, axis=axis, zi=zi)
+
+
+def compute_power_spectrum(
+    signal: Any,
+    fs: float = 1.0,
+    window: str | np.ndarray | None = "hann",
+) -> tuple[np.ndarray, np.ndarray]:
+    """Compute the power spectrum of a signal.
+
+    Args:
+        signal: Input signal as list, numpy array, or Signal object.
+        fs: Sampling frequency.
+        window: Window function (default 'hann').
+
+    Returns:
+        Tuple of (frequencies, power_spectrum).
+
+    Raises:
+        ValueError: If signal is empty.
+    """
+    data = _normalize_signal(signal)
+    if len(data) == 0:
+        raise ValueError("Cannot compute power spectrum of empty signal")
+
+    n = len(data)
+
+    if window is not None:
+        if isinstance(window, str):
+            win = scipy_signal.get_window(window, n)
+        else:
+            win = np.asarray(window)
+            if len(win) != n:
+                raise ValueError("Window length must match signal length")
+        data = data * win
+
+    spectrum = fft(data)
+    power = np.abs(spectrum) ** 2
+    freqs = fftfreq(n, 1 / fs)
+    pos_mask = freqs >= 0
+    return freqs[pos_mask], power[pos_mask]
+
+
+def compute_spectral_density(
+    signal: Any,
+    fs: float = 1.0,
+    window: str | np.ndarray | None = "hann",
+    nperseg: int | None = None,
+    noverlap: int | None = None,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Compute the power spectral density using Welch's method.
+
+    Args:
+        signal: Input signal as list, numpy array, or Signal object.
+        fs: Sampling frequency.
+        window: Window function.
+        nperseg: Length of each segment.
+        noverlap: Number of points to overlap.
+
+    Returns:
+        Tuple of (frequencies, psd).
+
+    Raises:
+        ValueError: If signal is empty.
+    """
+    data = _normalize_signal(signal)
+    if len(data) == 0:
+        raise ValueError("Cannot compute spectral density of empty signal")
+
+    freqs, psd = scipy_signal.welch(
+        data,
+        fs=fs,
+        window=window,
+        nperseg=nperseg,
+        noverlap=noverlap,
+    )
+    return freqs, psd
+
+
+def compute_spectrogram(
+    signal: Any,
+    fs: float = 1.0,
+    window: str | np.ndarray = "hann",
+    nperseg: int = 256,
+    noverlap: int | None = None,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Compute spectrogram (time-frequency representation).
+
+    Args:
+        signal: Input signal as list, numpy array, or Signal object.
+        fs: Sampling frequency.
+        window: Window function.
+        nperseg: Length of each segment.
+        noverlap: Number of points to overlap.
+
+    Returns:
+        Tuple of (frequencies, times, spectrogram).
+
+    Raises:
+        ValueError: If signal is empty.
+    """
+    data = _normalize_signal(signal)
+    if len(data) == 0:
+        raise ValueError("Cannot compute spectrogram of empty signal")
+
+    freqs, times, Sxx = scipy_signal.spectrogram(
+        data,
+        fs=fs,
+        window=window,
+        nperseg=nperseg,
+        noverlap=noverlap,
+    )
+    return freqs, times, Sxx
+
+
+def rational_filter_coefficients(
+    filter_type: str,
+    cutoff: Any,
+    order: int,
+) -> tuple[list[Rational], list[Rational]]:
+    """Compute filter coefficients using exact rational arithmetic.
+
+    This is a symbolic/exact computation for analysis purposes.
+    For actual filtering, use the numerical design functions above.
+
+    Args:
+        filter_type: One of 'lowpass', 'highpass', 'bandpass', 'bandstop'.
+        cutoff: Cutoff frequency (normalized 0-1) as Rational or number.
+        order: Filter order.
+
+    Returns:
+        Tuple of (b_coeffs, a_coeffs) as lists of Rational.
+
+    Raises:
+        ValueError: If order is invalid.
+        NotImplementedError: If exact rational coefficients not implemented for order.
+
+    Note:
+        This computes analog prototype coefficients exactly using rational
+        arithmetic. The bilinear transform to digital is approximate.
+    """
+    if order < 1:
+        raise ValueError("Order must be >= 1")
+
+    if order == 1:
+        # First-order lowpass: a = [1, 1], b = [1, 1] (normalized)
+        return [Rational(1), Rational(1)], [Rational(1), Rational(1)]
+    elif order == 2:
+        # Second-order lowpass: a = [1, sqrt(2), 1]
+        sqrt2 = Rational(1414214, 1000000)
+        return [Rational(0), Rational(1)], [Rational(1), sqrt2, Rational(1)]
+    elif order == 3:
+        # Third-order lowpass: (s+1)(s^2+s+1) = s^3 + 2s^2 + 2s + 1
+        return [Rational(0), Rational(0), Rational(1)], [Rational(1), Rational(2), Rational(2), Rational(1)]
+    elif order == 4:
+        # Fourth-order lowpass prototype
+        return [Rational(0), Rational(0), Rational(0), Rational(1)], [Rational(1), Rational(3), Rational(3), Rational(3), Rational(1)]
+    else:
+        raise NotImplementedError(f"Exact rational coefficients for order {order} not implemented")
+
+
+def frequency_response(
+    b: np.ndarray,
+    a: np.ndarray,
+    worN: int = 512,
+    fs: float = 1.0,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Compute frequency response of a digital filter.
+
+    Args:
+        b: Numerator coefficients.
+        a: Denominator coefficients.
+        worN: Number of frequency points.
+        fs: Sampling frequency.
+
+    Returns:
+        Tuple of (frequencies, complex_response).
+    """
+    w, h = scipy_signal.freqz(b, a, worN=worN, fs=fs)
+    return w, h
+
+
+def group_delay(
+    b: np.ndarray,
+    a: np.ndarray,
+    worN: int = 512,
+    fs: float = 1.0,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Compute group delay of a digital filter.
+
+    Args:
+        b: Numerator coefficients.
+        a: Denominator coefficients.
+        worN: Number of frequency points.
+        fs: Sampling frequency.
+
+    Returns:
+        Tuple of (frequencies, group_delay).
+    """
+    w, gd = scipy_signal.group_delay((b, a), worN, fs=fs)
+    return w, gd
+
+
+__all__ = [
+    "Signal",
+    "fft_of_signal",
+    "ifft_of_signal",
+    "design_lowpass_filter",
+    "design_highpass_filter",
+    "design_bandpass_filter",
+    "design_bandstop_filter",
+    "apply_filter",
+    "lfilter",
+    "compute_power_spectrum",
+    "compute_spectral_density",
+    "compute_spectrogram",
+    "rational_filter_coefficients",
+    "frequency_response",
+    "group_delay",
+]

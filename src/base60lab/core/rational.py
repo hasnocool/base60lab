@@ -1,0 +1,204 @@
+"""Exact rational arithmetic shared by all bases.
+
+Internally all calculations use exact rational numbers (fractions with integer
+numerator and denominator).  The display base is a presentation choice only;
+it never affects the underlying value and can never introduce rounding errors
+that create false patterns.
+"""
+
+from __future__ import annotations
+
+from fractions import Fraction
+from math import gcd
+from typing import Union
+
+
+class Rational:
+    """An exact rational number p/q in lowest terms.
+
+    Backed by :class:`fractions.Fraction` so every operation is exact and
+    never uses floating-point arithmetic internally.
+    """
+
+    __slots__ = ("_value",)
+
+    def __init__(self, numerator: int | Rational | Fraction, denominator: int = 1) -> None:
+        if isinstance(numerator, Rational):
+            self._value = numerator._value
+        elif isinstance(numerator, Fraction):
+            self._value = numerator
+        else:
+            self._value = Fraction(int(numerator), int(denominator))
+
+    # -- arithmetic -------------------------------------------------------
+
+    def __add__(self, other: object) -> Rational:
+        if not isinstance(other, Rational):
+            other = Rational(other)
+        return Rational(self._value + other._value)
+
+    def __sub__(self, other: object) -> Rational:
+        if not isinstance(other, Rational):
+            other = Rational(other)
+        return Rational(self._value - other._value)
+
+    def __mul__(self, other: object) -> Rational:
+        if not isinstance(other, Rational):
+            other = Rational(other)
+        return Rational(self._value * other._value)
+
+    def __truediv__(self, other: object) -> Rational:
+        if not isinstance(other, Rational):
+            other = Rational(other)
+        if other._value == 0:
+            raise ZeroDivisionError("division by zero rational")
+        return Rational(self._value / other._value)
+
+    def __pow__(self, exponent: int) -> Rational:
+        return Rational(self._value ** int(exponent))
+
+    def __mod__(self, other: object) -> Rational:
+        if not isinstance(other, Rational):
+            other = Rational(other)
+        if other._value == 0:
+            raise ZeroDivisionError("modulo by zero rational")
+        return Rational(self._value % other._value)
+
+    def __floordiv__(self, other: object) -> Rational:
+        if not isinstance(other, Rational):
+            other = Rational(other)
+        if other._value == 0:
+            raise ZeroDivisionError("floor division by zero rational")
+        return Rational(self._value // other._value)
+
+    def __neg__(self) -> Rational:
+        return Rational(-self._value)
+
+    def __abs__(self) -> Rational:
+        return Rational(abs(self._value))
+
+    # -- comparison -------------------------------------------------------
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Rational):
+            return self._value == other._value
+        if isinstance(other, (int, Fraction)):
+            return self._value == Fraction(other)
+        return NotImplemented
+
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, Rational):
+            other = Rational(other)
+        return self._value < other._value
+
+    def __le__(self, other: object) -> bool:
+        if not isinstance(other, Rational):
+            other = Rational(other)
+        return self._value <= other._value
+
+    def __gt__(self, other: object) -> bool:
+        if not isinstance(other, Rational):
+            other = Rational(other)
+        return self._value > other._value
+
+    def __ge__(self, other: object) -> bool:
+        if not isinstance(other, Rational):
+            other = Rational(other)
+        return self._value >= other._value
+
+    # -- properties -------------------------------------------------------
+
+    @property
+    def numerator(self) -> int:
+        return self._value.numerator
+
+    @property
+    def denominator(self) -> int:
+        return self._value.denominator
+
+    def is_integer(self) -> bool:
+        return self._value.denominator == 1
+
+    def is_terminating_in_base(self, base: int) -> bool:
+        """Return True if this rational has a terminating representation in ``base``.
+
+        A rational p/q (in lowest terms) terminates in integer base b iff every
+        prime factor of q divides b.
+        """
+        if base < 2:
+            raise ValueError("base must be >= 2")
+        q = self.denominator
+        # Remove all prime factors that divide base
+        b = base
+        d = 2
+        while d * d <= b:
+            while b % d == 0:
+                while q % d == 0:
+                    q //= d
+                b //= d
+            d += 1
+        if b > 1:
+            while q % b == 0:
+                q //= b
+        return q == 1
+
+    def repeating_period_in_base(self, base: int) -> int | None:
+        """Return the length of the repeating period in ``base``, or None if terminating."""
+        if self.is_terminating_in_base(base):
+            return None
+        # Remove all prime factors of denominator that divide base
+        q = self.denominator
+        g = gcd(q, base)
+        while g > 1:
+            while q % g == 0:
+                q //= g
+            g = gcd(q, base)
+        if q == 1:
+            return None
+        # Multiplicative order of base mod q: smallest k >= 1 such that base^k ≡ 1 (mod q)
+        x = base % q
+        if x == 0 or gcd(x, q) != 1:
+            return None
+        seen = x % q  # base^1 mod q
+        k = 1
+        while seen != 1:
+            seen = (seen * x) % q
+            k += 1
+            if k > q:  # safety bound
+                return None
+        return k
+
+    # -- conversion -------------------------------------------------------
+
+    def to_fraction(self) -> Fraction:
+        return self._value
+
+    def to_float(self) -> float:
+        """Only for display/debugging — never for internal arithmetic."""
+        return float(self._value)
+
+    def __repr__(self) -> str:
+        if self.denominator == 1:
+            return f"Rational({self.numerator})"
+        return f"Rational({self.numerator}/{self.denominator})"
+
+    def __str__(self) -> str:
+        return self.__repr__()
+
+    def __hash__(self) -> int:
+        return hash(self._value)
+
+
+# Convenience constructors
+def rational(numerator: int | Rational | Fraction, denominator: int = 1) -> Rational:
+    return Rational(numerator, denominator)
+
+
+def zero() -> Rational:
+    return Rational(0)
+
+
+def one() -> Rational:
+    return Rational(1)
+
+

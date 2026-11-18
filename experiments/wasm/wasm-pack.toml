@@ -1,0 +1,5 @@
+[profile.release]
+wasm-opt = ["-Oz", "--enable-mutable-globals"]
+
+[package]
+registry = "https://github.com/rustwasm/wasm-pack"

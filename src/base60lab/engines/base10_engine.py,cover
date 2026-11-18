@@ -1,0 +1,201 @@
+> """Base-10 engine — exact rational arithmetic and representation for decimal.
+  
+> Base-10 is treated as a well-understood reference system: its factorisation
+> (10 = 2 × 5) and terminating-fraction rule are known truths.  All internal
+> calculations use exact rational arithmetic from ``core.rational``; the
+> display base is purely a presentation choice.
+> """
+  
+> from __future__ import annotations
+  
+> from typing import Any
+  
+> from ..core.rational import Rational
+> from ..core.types import BaseNumber, Expression, Function, Notation, NotationSystem
+> from ..core.unknowns import UnknownEntry, UnknownsRegistry
+  
+  
+> class Base10Engine:
+>     """Engine for base-10 (decimal) representation and arithmetic.
+  
+>     Known truths encoded here:
+>       - Base factorisation: 10 = 2 × 5
+>       - A rational p/q terminates in base 10 iff q's prime factors are only 2 and/or 5.
+>       - Digit symbols: 0-9
+>       - Fractional point: "."
+>     """
+  
+>     BASE = 10
+>     DIGITS = tuple(str(d) for d in range(10))
+>     FRACTIONAL_POINT = "."
+>     FACTORISATION = {2: 1, 5: 1}
+  
+>     def __init__(self, unknowns: UnknownsRegistry | None = None) -> None:
+>         self.unknowns = unknowns or UnknownsRegistry()
+>         self._register_known_truths()
+  
+      # -- known truths -----------------------------------------------------
+  
+>     def _register_known_truths(self) -> None:
+>         """Register base-10 known truths as proven entries."""
+>         truths = [
+>             UnknownEntry(
+>                 id="base10.factorisation",
+>                 base=10,
+>                 category="arithmetic",
+>                 statement="10 = 2 × 5",
+>                 status="proven",
+>                 version="1.0.0",
+>             ),
+>             UnknownEntry(
+>                 id="base10.terminating_rule",
+>                 base=10,
+>                 category="fractions",
+>                 statement="A rational terminates in base 10 iff its reduced denominator's prime factors are only 2 and/or 5.",
+>                 status="proven",
+>                 version="1.0.0",
+>             ),
+>             UnknownEntry(
+>                 id="base10.digit_symbols",
+>                 base=10,
+>                 category="notation",
+>                 statement="Base-10 digit symbols are 0-9.",
+>                 status="proven",
+>                 version="1.0.0",
+>             ),
+>         ]
+>         for t in truths:
+>             self.unknowns.add(t)
+  
+      # -- conversion -------------------------------------------------------
+  
+>     def from_rational(self, value: Rational) -> BaseNumber:
+>         """Wrap an exact rational value as a base-10 BaseNumber."""
+>         return BaseNumber(value=value, base=self.BASE)
+  
+>     def to_rational(self, number: BaseNumber) -> Rational:
+>         """Extract the exact rational value from a BaseNumber (base-independent)."""
+>         return number.value
+  
+>     def to_notation(self, number: BaseNumber) -> Notation:
+>         """Render a base-10 BaseNumber as a decimal notation string."""
+>         return _render_rational_decimal(number.value)
+  
+>     def convert_from_base(self, number: BaseNumber, target_base: int) -> BaseNumber:
+>         """Convert a BaseNumber from any base to base-10 (value is base-independent)."""
+          # The internal value is already base-independent; just retag.
+>         return BaseNumber(value=number.value, base=self.BASE)
+  
+      # -- arithmetic (delegate to exact rational core) ---------------------
+  
+>     def add(self, a: BaseNumber, b: BaseNumber) -> BaseNumber:
+>         return BaseNumber(value=a.value + b.value, base=self.BASE)
+  
+>     def sub(self, a: BaseNumber, b: BaseNumber) -> BaseNumber:
+>         return BaseNumber(value=a.value - b.value, base=self.BASE)
+  
+>     def mul(self, a: BaseNumber, b: BaseNumber) -> BaseNumber:
+>         return BaseNumber(value=a.value * b.value, base=self.BASE)
+  
+>     def div(self, a: BaseNumber, b: BaseNumber) -> BaseNumber:
+>         return BaseNumber(value=a.value / b.value, base=self.BASE)
+  
+>     def reciprocal(self, denominator: int) -> BaseNumber:
+>         return self.from_rational(Rational(1, denominator))
+  
+>     def neg(self, a: BaseNumber) -> BaseNumber:
+>         return BaseNumber(value=-a.value, base=self.BASE)
+  
+>     def pow(self, a: BaseNumber, exponent: int) -> BaseNumber:
+>         return BaseNumber(value=a.value ** exponent, base=self.BASE)
+  
+      # -- functions --------------------------------------------------------
+  
+>     def function(self, name: str) -> Function:
+>         """Return a built-in function by name, or raise if unknown."""
+>         funcs = {
+>             "add": Function("add", 2, evaluate=lambda x, y: self.add(x, y).value),
+>             "sub": Function("sub", 2, evaluate=lambda x, y: self.sub(x, y).value),
+>             "mul": Function("mul", 2, evaluate=lambda x, y: self.mul(x, y).value),
+>             "div": Function("div", 2, evaluate=lambda x, y: self.div(x, y).value),
+>         }
+>         if name not in funcs:
+>             raise KeyError(f"function {name!r} not available in base-10 engine")
+>         return funcs[name]
+  
+      # -- introspection ----------------------------------------------------
+  
+>     def terminating_denominators(self, limit: int = 360) -> list[int]:
+>         """Return denominators 1..limit whose reciprocals terminate in base 10."""
+>         return [
+>             d for d in range(1, limit + 1)
+>             if Rational(1, d).is_terminating_in_base(self.BASE)
+>         ]
+  
+>     def repeating_period(self, denominator: int) -> int | None:
+>         """Return the repeating period of 1/denominator in base 10, or None if terminating."""
+>         return Rational(1, denominator).repeating_period_in_base(self.BASE)
+  
+>     def describe(self) -> dict[str, Any]:
+>         return {
+>             "base": self.BASE,
+>             "name": "decimal",
+>             "factorisation": self.FACTORISATION,
+>             "digit_symbols": self.DIGITS,
+>             "fractional_point": self.FRACTIONAL_POINT,
+>             "known_truths_complete": True,
+>             "unknowns_count": len(self.unknowns),
+>         }
+  
+  
+> def _render_rational_decimal(value: Rational) -> Notation:
+>     """Render an exact rational as decimal notation (terminating or repeating)."""
+>     num = value.numerator
+>     den = value.denominator
+>     sign = "-" if num < 0 else ""
+>     num = abs(num)
+  
+>     integer_part = num // den
+>     remainder = num % den
+  
+>     if remainder == 0:
+>         text = f"{sign}{integer_part}"
+>         return Notation(
+>             base=10,
+>             digits=tuple(str(d) for d in range(10)),
+>             fractional_point=".",
+>             text=text,
+>             repeating=None,
+>         )
+  
+      # Long division to detect repeating period
+>     digits: list[str] = []
+>     seen: dict[int, int] = {}
+>     r = remainder
+>     repeating_start: int | None = None
+  
+>     while r != 0 and r not in seen:
+>         seen[r] = len(digits)
+>         r *= 10
+>         digit = r // den
+>         digits.append(str(digit))
+>         r = r % den
+  
+>     if r in seen:
+>         repeating_start = seen[r]
+>         non_repeating = "".join(digits[:repeating_start])
+>         repeating_part = "".join(digits[repeating_start:])
+>         text = f"{sign}{integer_part}.{non_repeating}({repeating_part})"
+>     else:
+>         text = f"{sign}{integer_part}." + "".join(digits)
+  
+>     return Notation(
+>         base=10,
+>         digits=tuple(str(d) for d in range(10)),
+>         fractional_point=".",
+>         text=text,
+>         repeating=repeating_start,
+>     )
+  
+  
+> __all__ = ["Base10Engine"]

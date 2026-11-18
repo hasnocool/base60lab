@@ -1,0 +1,452 @@
+> """FFT performance benchmarking across smooth sizes.
+  
+> Benchmarks FFT execution time, memory, precision, and accuracy for:
+> - Powers of 2
+> - 5-smooth numbers (regular numbers: 2^a * 3^b * 5^c)
+> - 12-smooth numbers (2^a * 3^b * 5^c * 7^d * 11^e)
+> - 60-smooth numbers (primes up to 60)
+> - Poorly factored numbers (large prime factors)
+  
+> Uses numpy/scipy for FFT computation with deterministic seeds.
+> """
+  
+> from __future__ import annotations
+  
+> import time
+> import tracemalloc
+> from dataclasses import dataclass, field
+> from math import gcd
+> from typing import Literal
+  
+> import numpy as np
+> from scipy import fft
+  
+  # Type alias for size category
+> SizeCategory = Literal["powers_of_2", "5_smooth", "12_smooth", "60_smooth", "poorly_factored"]
+  
+  
+  # Prime lists for smooth number generation
+> _PRIMES_UPTO_60 = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59]
+> _PRIMES_5_SMOOTH = [2, 3, 5]
+> _PRIMES_12_SMOOTH = [2, 3, 5, 7, 11]
+> _PRIMES_60_SMOOTH = _PRIMES_UPTO_60
+  
+  
+> @dataclass(frozen=True)
+> class BenchmarkResult:
+>     """Result of a single FFT benchmark run."""
+  
+>     size: int
+>     category: SizeCategory
+>     execution_time_ns: int
+>     peak_memory_bytes: int
+>     precision_bits: float
+>     accuracy_ulps: float
+>     forward_time_ns: int
+>     inverse_time_ns: int
+  
+>     def to_dict(self) -> dict:
+>         return {
+>             "size": self.size,
+>             "category": self.category,
+>             "execution_time_ns": self.execution_time_ns,
+>             "peak_memory_bytes": self.peak_memory_bytes,
+>             "precision_bits": self.precision_bits,
+>             "accuracy_ulps": self.accuracy_ulps,
+>             "forward_time_ns": self.forward_time_ns,
+>             "inverse_time_ns": self.inverse_time_ns,
+>         }
+  
+  
+> @dataclass(frozen=True)
+> class BenchmarkSummary:
+>     """Aggregated benchmark results for a category."""
+  
+>     category: SizeCategory
+>     sizes_tested: list[int]
+>     results: list[BenchmarkResult] = field(default_factory=list)
+>     mean_execution_time_ns: float = 0.0
+>     median_execution_time_ns: float = 0.0
+>     mean_memory_bytes: float = 0.0
+>     mean_precision_bits: float = 0.0
+>     mean_accuracy_ulps: float = 0.0
+  
+>     def to_dict(self) -> dict:
+>         return {
+>             "category": self.category,
+>             "sizes_tested": self.sizes_tested,
+>             "results": [r.to_dict() for r in self.results],
+>             "mean_execution_time_ns": self.mean_execution_time_ns,
+>             "median_execution_time_ns": self.median_execution_time_ns,
+>             "mean_memory_bytes": self.mean_memory_bytes,
+>             "mean_precision_bits": self.mean_precision_bits,
+>             "mean_accuracy_ulps": self.mean_accuracy_ulps,
+>         }
+  
+  
+> def is_smooth(n: int, max_prime: int) -> bool:
+>     """Check if n is smooth with respect to max_prime (all prime factors <= max_prime)."""
+>     if n <= 1:
+>         return True
+      # Remove all prime factors up to max_prime
+>     temp = n
+>     for p in range(2, max_prime + 1):
+>         if p * p > temp:
+>             break
+>         while temp % p == 0:
+>             temp //= p
+>     if temp > 1 and temp > max_prime:
+>         return False
+>     return True
+  
+  
+> def _largest_prime_factor(n: int) -> int:
+>     """Return the largest prime factor of n."""
+>     if n <= 1:
+>         return 1
+>     largest = 1
+>     temp = n
+      # Check factor 2
+>     while temp % 2 == 0:
+>         largest = 2
+>         temp //= 2
+      # Check odd factors
+>     f = 3
+>     while f * f <= temp:
+>         while temp % f == 0:
+>             largest = f
+>             temp //= f
+>         f += 2
+>     if temp > 1:
+>         largest = temp
+>     return largest
+  
+  
+> def is_powers_of_2(n: int) -> bool:
+>     """Check if n is a power of 2."""
+>     return n > 0 and (n & (n - 1)) == 0
+  
+  
+> def is_5_smooth(n: int) -> bool:
+>     """Check if n is 5-smooth (regular number: only prime factors 2, 3, 5)."""
+>     return is_smooth(n, 5)
+  
+  
+> def is_12_smooth(n: int) -> bool:
+>     """Check if n is 12-smooth (prime factors <= 11)."""
+>     return is_smooth(n, 11)
+  
+  
+> def is_60_smooth(n: int) -> bool:
+>     """Check if n is 60-smooth (prime factors <= 59)."""
+>     return is_smooth(n, 59)
+  
+  
+> def is_poorly_factored(n: int, min_large_prime_factor: int = 13) -> bool:
+>     """Check if n has a large prime factor (poorly factored for FFT).
+  
+>     A number is poorly factored if its largest prime factor exceeds min_large_prime_factor.
+>     """
+>     return _largest_prime_factor(n) >= min_large_prime_factor
+  
+  
+> def generate_sizes(
+>     category: SizeCategory,
+>     count: int,
+>     min_size: int = 16,
+>     max_size: int = 4096,
+>     seed: int = 42,
+> ) -> list[int]:
+>     """Generate FFT sizes for a given category.
+  
+>     Args:
+>         category: The smoothness category
+>         count: Number of sizes to generate
+>         min_size: Minimum size (inclusive)
+>         max_size: Maximum size (inclusive)
+>         seed: Random seed for reproducibility
+  
+>     Returns:
+>         Sorted list of sizes
+>     """
+>     rng = np.random.default_rng(seed)
+  
+>     if category == "powers_of_2":
+          # Powers of 2: 16, 32, 64, 128, 256, 512, 1024, 2048, 4096
+>         sizes = []
+>         n = 1
+>         while (size := (1 << n)) <= max_size:
+>             if size >= min_size:
+>                 sizes.append(size)
+>             n += 1
+>         return sizes[:count]
+  
+      # For other categories, generate candidates and filter
+>     candidates = list(range(min_size, max_size + 1))
+  
+>     if category == "5_smooth":
+>         filtered = [n for n in candidates if is_5_smooth(n) and not is_powers_of_2(n)]
+>     elif category == "12_smooth":
+>         filtered = [n for n in candidates if is_12_smooth(n) and not is_5_smooth(n)]
+>     elif category == "60_smooth":
+>         filtered = [n for n in candidates if is_60_smooth(n) and not is_12_smooth(n)]
+>     elif category == "poorly_factored":
+>         filtered = [n for n in candidates if is_poorly_factored(n)]
+>     else:
+>         raise ValueError(f"Unknown category: {category}")
+  
+      # Randomly sample if we have more than needed
+>     if len(filtered) <= count:
+>         return sorted(filtered)
+  
+      # Use random choice without replacement for deterministic sampling
+>     sampled = rng.choice(filtered, size=count, replace=False)
+>     return sorted(sampled.tolist())
+  
+  
+> def _generate_test_signal(size: int, seed: int = 42) -> np.ndarray:
+>     """Generate a deterministic test signal for benchmarking."""
+>     rng = np.random.default_rng(seed)
+      # Mix of frequencies to test FFT accuracy
+>     t = np.arange(size, dtype=np.float64) / size
+>     signal = (
+>         np.sin(2 * np.pi * 1 * t)
+>         + 0.5 * np.sin(2 * np.pi * 3 * t)
+>         + 0.25 * np.sin(2 * np.pi * 7 * t)
+>         + 0.1 * rng.normal(0, 1, size)
+>     )
+>     return signal.astype(np.complex128)
+  
+  
+> def _compute_precision_bits(original: np.ndarray, reconstructed: np.ndarray) -> float:
+>     """Compute precision in bits by comparing original and reconstructed signals."""
+      # Use relative error in L2 norm
+>     error = np.linalg.norm(original - reconstructed)
+>     signal_norm = np.linalg.norm(original)
+>     if signal_norm == 0:
+>         return float("inf")
+>     relative_error = error / signal_norm
+>     if relative_error == 0:
+>         return float("inf")
+      # Convert to bits: -log2(relative_error)
+>     return -np.log2(relative_error)
+  
+  
+> def _compute_accuracy_ulps(original: np.ndarray, reconstructed: np.ndarray) -> float:
+>     """Compute accuracy in ULPs (units in the last place)."""
+      # For complex numbers, compute ULP distance per component
+>     diff = np.abs(original - reconstructed)
+      # ULP for complex128: spacing of representable values
+>     ulp = np.finfo(np.complex128).eps * np.maximum(np.abs(original), np.abs(reconstructed))
+      # Avoid division by zero
+>     ulp = np.where(ulp == 0, np.finfo(np.complex128).eps, ulp)
+>     ulp_distances = diff / ulp
+>     return float(np.mean(ulp_distances))
+  
+  
+> def benchmark_fft(size: int, iterations: int = 10, warmup: int = 3, seed: int = 42) -> BenchmarkResult:
+>     """Benchmark FFT for a single size.
+  
+>     Args:
+>         size: FFT size (must be positive)
+>         iterations: Number of timed iterations
+>         warmup: Number of warmup iterations (not timed)
+>         seed: Random seed for signal generation
+  
+>     Returns:
+>         BenchmarkResult with timing, memory, precision, accuracy
+  
+>     Raises:
+>         ValueError: If size is not positive
+>     """
+>     if size <= 0:
+>         raise ValueError(f"FFT size must be positive, got {size}")
+  
+      # Generate test signal
+>     signal = _generate_test_signal(size, seed)
+  
+      # Warmup
+>     for _ in range(warmup):
+>         fft.fft(signal)
+>         fft.ifft(signal)
+  
+      # Time forward FFT
+>     forward_times = []
+>     for _ in range(iterations):
+>         start = time.perf_counter_ns()
+>         spectrum = fft.fft(signal)
+>         end = time.perf_counter_ns()
+>         forward_times.append(end - start)
+  
+      # Time inverse FFT
+>     inverse_times = []
+>     for _ in range(iterations):
+>         start = time.perf_counter_ns()
+>         reconstructed = fft.ifft(spectrum)
+>         end = time.perf_counter_ns()
+>         inverse_times.append(end - start)
+  
+      # Measure memory during FFT
+>     tracemalloc.start()
+>     _ = fft.fft(signal)
+>     _, peak_memory = tracemalloc.get_traced_memory()
+>     tracemalloc.stop()
+  
+      # Compute precision and accuracy
+>     reconstructed_full = fft.ifft(fft.fft(signal))
+>     precision_bits = _compute_precision_bits(signal, reconstructed_full)
+>     accuracy_ulps = _compute_accuracy_ulps(signal, reconstructed_full)
+  
+      # Determine category - check poorly_factored first since it overlaps with smooth categories
+>     if is_poorly_factored(size):
+>         category: SizeCategory = "poorly_factored"
+>     elif is_powers_of_2(size):
+>         category = "powers_of_2"
+>     elif is_5_smooth(size):
+>         category = "5_smooth"
+>     elif is_12_smooth(size):
+>         category = "12_smooth"
+!     elif is_60_smooth(size):
+!         category = "60_smooth"
+!     else:
+!         category = "poorly_factored"
+  
+>     return BenchmarkResult(
+>         size=size,
+>         category=category,
+>         execution_time_ns=int(np.median(forward_times) + np.median(inverse_times)),
+>         peak_memory_bytes=peak_memory,
+>         precision_bits=precision_bits,
+>         accuracy_ulps=accuracy_ulps,
+>         forward_time_ns=int(np.median(forward_times)),
+>         inverse_time_ns=int(np.median(inverse_times)),
+>     )
+  
+  
+> def run_benchmarks(
+>     sizes_per_category: int = 8,
+>     min_size: int = 16,
+>     max_size: int = 4096,
+>     iterations: int = 10,
+>     warmup: int = 3,
+>     seed: int = 42,
+> ) -> dict[SizeCategory, BenchmarkSummary]:
+>     """Run benchmarks across all smoothness categories.
+  
+>     Args:
+>         sizes_per_category: Number of sizes to test per category
+>         min_size: Minimum FFT size
+>         max_size: Maximum FFT size
+>         iterations: Timed iterations per size
+>         warmup: Warmup iterations per size
+>         seed: Random seed for reproducibility
+  
+>     Returns:
+>         Dict mapping category to BenchmarkSummary
+>     """
+>     categories: list[SizeCategory] = [
+>         "powers_of_2",
+>         "5_smooth",
+>         "12_smooth",
+>         "60_smooth",
+>         "poorly_factored",
+>     ]
+  
+>     results: dict[SizeCategory, BenchmarkSummary] = {}
+  
+>     for category in categories:
+>         sizes = generate_sizes(category, sizes_per_category, min_size, max_size, seed)
+>         if not sizes:
+              # No sizes available for this category in range
+>             results[category] = BenchmarkSummary(
+>                 category=category,
+>                 sizes_tested=[],
+>                 results=[],
+>             )
+>             continue
+  
+>         category_results = []
+>         for size in sizes:
+>             try:
+>                 result = benchmark_fft(size, iterations, warmup, seed)
+>                 category_results.append(result)
+>             except Exception as e:
+                  # Log and continue
+>                 print(f"Warning: Benchmark failed for size {size}: {e}")
+>                 continue
+  
+>         if category_results:
+>             exec_times = [r.execution_time_ns for r in category_results]
+>             memories = [r.peak_memory_bytes for r in category_results]
+>             precisions = [r.precision_bits for r in category_results]
+>             accuracies = [r.accuracy_ulps for r in category_results]
+  
+>             summary = BenchmarkSummary(
+>                 category=category,
+>                 sizes_tested=sizes,
+>                 results=category_results,
+>                 mean_execution_time_ns=float(np.mean(exec_times)),
+>                 median_execution_time_ns=float(np.median(exec_times)),
+>                 mean_memory_bytes=float(np.mean(memories)),
+>                 mean_precision_bits=float(np.mean(precisions)),
+>                 mean_accuracy_ulps=float(np.mean(accuracies)),
+>             )
+>         else:
+>             summary = BenchmarkSummary(
+>                 category=category,
+>                 sizes_tested=sizes,
+>                 results=[],
+>             )
+  
+>         results[category] = summary
+  
+>     return results
+  
+  
+> def print_benchmark_results(results: dict[SizeCategory, BenchmarkSummary]) -> None:
+>     """Print formatted benchmark results."""
+>     print("=" * 80)
+>     print("FFT Benchmark Results")
+>     print("=" * 80)
+  
+>     for category in ["powers_of_2", "5_smooth", "12_smooth", "60_smooth", "poorly_factored"]:
+>         summary = results.get(category)
+>         if not summary or not summary.results:
+>             print(f"\n{category}: No data")
+>             continue
+  
+>         print(f"\n{category.upper()} ({len(summary.results)} sizes tested)")
+>         print("-" * 80)
+>         print(f"{'Size':>8} | {'Time (ns)':>12} | {'Memory (KB)':>12} | {'Precision (bits)':>16} | {'Accuracy (ULPs)':>16}")
+>         print("-" * 80)
+  
+>         for result in summary.results:
+>             print(
+>                 f"{result.size:>8} | {result.execution_time_ns:>12} | "
+>                 f"{result.peak_memory_bytes / 1024:>12.1f} | "
+>                 f"{result.precision_bits:>16.2f} | {result.accuracy_ulps:>16.2f}"
+>             )
+  
+>         print("-" * 80)
+>         print(
+>             f"{'MEAN':>8} | {summary.mean_execution_time_ns:>12.0f} | "
+>             f"{summary.mean_memory_bytes / 1024:>12.1f} | "
+>             f"{summary.mean_precision_bits:>16.2f} | {summary.mean_accuracy_ulps:>16.2f}"
+>         )
+  
+  
+> __all__ = [
+>     "SizeCategory",
+>     "BenchmarkResult",
+>     "BenchmarkSummary",
+>     "is_smooth",
+>     "is_powers_of_2",
+>     "is_5_smooth",
+>     "is_12_smooth",
+>     "is_60_smooth",
+>     "is_poorly_factored",
+>     "generate_sizes",
+>     "benchmark_fft",
+>     "run_benchmarks",
+>     "print_benchmark_results",
+> ]
